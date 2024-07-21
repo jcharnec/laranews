@@ -1,0 +1,14 @@
+{
+    "E-Mail Address" : "E-mail",
+    "Password" : "Contraseña",
+    "Login" : "Iniciar sesión",
+    "Register" : "Registrarse",
+    "Forgot Password?" : "¿Olvidaste tu contraseña?",
+    "Remember Me" : "Recuérdame",
+    "Name" : "Nombre",
+    "Confirm Password" : "Repetir contraseña",
+    "Dashboard" : "Mi perfil",
+    "You are logged in!" : "Identificado correctamente",
+    "Population" : "Población",
+    "Birthdate" : "Fecha de nacimiento"
+}
