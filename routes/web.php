@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\CommentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//portada
 Route::get('/', function () {
     return view('welcome');
 });
+
+// CRUD de noticias
+Route::resource('/reports', ReportController::class);
+
