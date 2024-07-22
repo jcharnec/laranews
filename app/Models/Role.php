@@ -9,6 +9,10 @@ class Role extends Model
 {
     use HasFactory;
 
+    /**
+     * Summary of fillable
+     * @var array
+     */
     protected $fillable = ['role'];
 
     /**
