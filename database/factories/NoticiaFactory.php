@@ -26,11 +26,11 @@ class NoticiaFactory extends Factory
             'titulo' => $this->faker->sentence,
             'tema' => $this->faker->word,
             'texto' => $this->faker->paragraphs(3, true),
-            'imagen' => $this->faker->imageUrl,
-            'visitas' => $this->faker->numberBetween(0, 1000),
+            'imagen' => null, // Sin imagen por defecto
+            'visitas' => 0, // Inicializa visitas a 0
             'user_id' => \App\Models\User::factory(),
             'published_at' => $this->faker->optional()->dateTimeThisYear,
-            'rejected' => $this->faker->boolean(10), // 10% chance of being rejected
+            'rejected' => false, // Inicializa rejected a false
             'created_at' => now(),
             'updated_at' => now(),
         ];

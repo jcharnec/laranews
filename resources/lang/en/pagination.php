@@ -12,7 +12,7 @@ return [
     | you want to customize your views to better match your application.
     |
     */
-
+    'noticias' => env('NOTICIAS_PER_PAGE', 8),
     'previous' => '&laquo; Previous',
     'next' => 'Next &raquo;',
 

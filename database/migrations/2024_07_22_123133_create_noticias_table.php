@@ -20,8 +20,7 @@ class CreateNoticiasTable extends Migration
             $table->string('tema', 255);
             $table->text('texto'); // Ajustado para ser tipo text
             $table->string('imagen', 255)->nullable();
-            $table->integer('visitas');
-
+            $table->integer('visitas')->default(0);
             $table->unsignedBigInteger('user_id')->nullable();
             // Marcas de tiempo: campos created_at y updated_at
             $table->timestamps();
