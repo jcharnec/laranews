@@ -1,8 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\CommentController;
+use App\Http\Controllers\NoticiaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,5 +20,16 @@ Route::get('/', function () {
 });
 
 // CRUD de noticias
-Route::resource('/reports', ReportController::class);
+Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');         //nueva noticia
+Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');                 //guardar moto
+
+Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');                  //listado
+Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show');           //detalles
+
+Route::get('/noticias/{noticia}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit');      //editar
+Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');       //actualizar
+
+Route::get('/noticias/{noticia}/delete', [NoticiaController::class, 'delete'])->name('noticias.delete');  //conf.borrado
+Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');  //eliminar
+
 
