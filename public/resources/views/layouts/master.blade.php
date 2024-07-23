@@ -5,11 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Proyecto Laranews">
-    <title>{{config('app.name')}} - @yield('titulo')</title>
+    <title>{{ config('app.name') }} - @yield('titulo')</title>
 
     <!-- CSS para Bootstrap -->
-    <link rel="stylesheet" type="text/css" href="{{asset('css/bootstrap.min.css')}}">
-    <script src="{{(asset('js/bootstrap.bundle.js'))}}"></script>
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
+    <script src="{{ asset('js/bootstrap.bundle.js') }}"></script>
 </head>
 
 <body class="container p-3">
@@ -29,36 +29,34 @@
                     <div class="container">
                         <ul class="nav nav-pills my-3">
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina =='portada'? 'active' : ''}}" href="{{route('welcome')}}">Inicio</a>
+                                <a class="nav-link {{ $pagina == 'portada' ? 'active' : '' }}" href="{{ route('welcome') }}">Inicio</a>
                             </li>
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina == 'noticias.index' ||
-                                    $pagina == 'noticias.search'? 'active':''}}" href="{{route('noticias.index')}}">Noticias</a>
+                                <a class="nav-link {{ $pagina == 'noticias.index' || $pagina == 'noticias.search' ? 'active' : '' }}" href="{{ route('noticias.index') }}">Noticias</a>
                             </li>
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina == 'contacto'? 'active':''}}" href="{{route('contacto')}}">Contacto</a>
+                                <a class="nav-link {{ $pagina == 'contacto' ? 'active' : '' }}" href="{{ route('contacto') }}">Contacto</a>
                             </li>
                             @guest
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina == 'register'? 'active':''}}" href="{{route('register')}}">Registro</a>
+                                <a class="nav-link {{ $pagina == 'register' ? 'active' : '' }}" href="{{ route('register') }}">Registro</a>
                             </li>
                             @endguest
 
                             @auth
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina == 'home'? 'active':''}}" href="{{route('home')}}">Mis noticias</a>
+                                <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Mis noticias</a>
                             </li>
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina =='noticias.create'? 'active':''}}" href="{{action([App\Http\Controllers\NoticiaController::class, 'create'])}}">Nueva noticia</a>
+                                <a class="nav-link {{ $pagina == 'noticias.create' ? 'active' : '' }}" href="{{ action([App\Http\Controllers\NoticiaController::class, 'create']) }}">Nueva noticia</a>
                             </li>
                             @if(Auth::user()->hasRole('administrador'))
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{$pagina =='admin.deleted.bikes'? 'active':''}}" href="{{route('admin.deleted.bikes')}}">Noticias borradas</a>
+                                <a class="nav-link {{ $pagina == 'admin.deleted.noticias' ? 'active' : '' }}" href="{{ route('admin.deleted.noticias') }}">Noticias borradas</a>
                             </li>
 
                             <li class="nav-item mr-2">
-                                <a class="nav-link 
-                                            {{$pagina =='admin.users' || $pagina=='admin.users.search' ? 'active':''}}" href="{{route('admin.users')}}">Gestión de usuarios</a>
+                                <a class="nav-link {{ $pagina == 'admin.users' || $pagina == 'admin.users.search' ? 'active' : '' }}" href="{{ route('admin.users') }}">Gestión de usuarios</a>
                             </li>
                             @endif
                             @endauth
@@ -87,8 +85,7 @@
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                    document.getElementById('logout-form').submit();">
+                            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                 {{ __('Logout') }}
                             </a>
 
@@ -128,13 +125,13 @@
         </x-alert>
         @endif
 
-        <p>Contamos con un total de {{$total}} noticias en nuestro portal.</p>
+        <p>Contamos con un total de {{ $total ?? 0 }} noticias en nuestro portal.</p>
 
         @yield('contenido')
         <div class="d-flex justify-content-center">
             <div class="btn-group" role="group" aria-label="links">
                 @section('enlaces')
-                <a href="{{url()->previous()}}" class="btn btn-primary m-2">Atrás</a>
+                <a href="{{ url()->previous() }}" class="btn btn-primary m-2">Atrás</a>
                 <a href="{{ route('welcome') }}" class="btn btn-primary m-2">Inicio</a>
                 @show
             </div>
@@ -146,7 +143,6 @@
                 Desarrollado haciendo uso de <b>Laravel</b> y <b>Bootstrap</b>.</p>
         </footer>
         @show
-        </div>
     </main>
 </body>
 

@@ -10,7 +10,7 @@ class WelcomeController extends Controller
     public function index()
     {
         // Recuperar las últimas 4 noticias
-        $noticias = Noticia::latest()->take(4)->get();
+        $noticias = Noticia::latest()->take(3)->get();
         $total = Noticia::count();
 
         // Pasar las noticias y el total a la vista

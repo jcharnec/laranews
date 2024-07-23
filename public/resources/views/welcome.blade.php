@@ -22,14 +22,12 @@
     <div class="col-12">
         <div class="row">
             @foreach ($noticias as $noticia)
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <img class="card-img-top" src="{{ $noticia->imagen ? asset('storage/images/noticias/' . $noticia->imagen) : asset('storage/images/noticias/default.jpg') }}" alt="Imagen de {{ $noticia->titulo }}">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $noticia->titulo }}</h5>
-                        <p class="card-text">{{ Str::limit($noticia->texto, 150, '...') }}</p>
-                        <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-primary">Ver detalles</a>
-                    </div>
+            <div class="card h-100">
+                <img class="card-img-top" src="{{ $noticia->imagen ? asset('storage/images/noticias/' . $noticia->imagen) : asset('storage/images/noticias/default.jpg') }}" alt="Imagen de {{ $noticia->titulo }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ $noticia->titulo }}</h5>
+                    <p class="card-text">{{ Str::limit($noticia->texto, 150, '...') }}</p>
+                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-primary">Ver detalles</a>
                 </div>
             </div>
             @endforeach
