@@ -15,12 +15,10 @@ class NoticiaController extends Controller
      */
     public function index(Request $request)
     {
-        $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(8);
-        $total = Noticia::count();
+        $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(9);
 
         return View::make('noticias.list', [
-            'noticias' => $noticias, 
-            'total' => $total,
+            'noticias' => $noticias
         ]);
     }
 
@@ -38,16 +36,13 @@ class NoticiaController extends Controller
 
         $noticias = Noticia::where('titulo', 'LIKE', '%' . $titulo . '%')
             ->where('tema', 'LIKE', "%$tema%")
-            ->paginate(8)
+            ->paginate(9)
             ->appends(['titulo' => $titulo, 'tema' => $tema]);
-
-        $total = Noticia::count();
 
         return view('noticias.list', [
             'noticias' => $noticias,
             'titulo' => $titulo,
-            'tema' => $tema,
-            'total' => $total
+            'tema' => $tema
         ]);
     }
 
@@ -76,7 +71,7 @@ class NoticiaController extends Controller
             'texto' => 'required',
             'imagen' => 'nullable|image',
         ]);
-    
+
         $noticia = new Noticia();
         $noticia->titulo = $request->titulo;
         $noticia->tema = $request->tema;
@@ -84,17 +79,17 @@ class NoticiaController extends Controller
         $noticia->visitas = 0; // Inicializa visitas a 0
         $noticia->published_at = null; // Dejar null hasta que sea revisada
         $noticia->rejected = false; // Inicializa rejected a false
-    
+
         if ($request->hasFile('imagen')) {
             $path = $request->file('imagen')->store('public/images/noticias');
             $noticia->imagen = basename($path);
         }
-    
+
         $noticia->save();
-    
+
         return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
     }
-    
+
 
     /**
      * Display the specified resource.
@@ -109,7 +104,8 @@ class NoticiaController extends Controller
         $noticia = Noticia::findOrFail($id);
 
         //carga la vista correspondiente y le pasa la noticia
-        return view('noticias.show', ['
+        return view('noticias.show', [
+            '
             noticia' => $noticia
         ]);
     }
@@ -140,7 +136,7 @@ class NoticiaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Noticia $noticia)
     {
         //
     }
@@ -161,10 +157,14 @@ class NoticiaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         //busca la noticia seleccionada
         $noticia = Noticia::findOrFail($id);
+
+        //comporbar la validez de la firma de la URL
+        if (!$request->hasValidSignature())
+            abort(401, 'La firma de la URL no s epudo validar');
 
         // la borra de la base de datos
         $noticia->delete();

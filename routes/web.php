@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ContactoController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +30,8 @@ Route::post('/contacto', [ContactoController::class, 'send'])->name('contacto.em
 Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create'); // Nueva noticia
 Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store'); // Guardar noticia
 Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index'); // Listado
-Route::get('/noticias/search', [NoticiaController::class, 'search'])->name('noticias.search'); // Búsqueda
+Route::get('/noticias/search/{titulo?}/{tema?}',[NoticiaController::class, 'search'])
+    ->name('noticias.search'); // Búsqueda
 Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show'); // Detalles
 Route::get('/noticias/{noticia}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit'); // Editar
 Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update'); // Actualizar
