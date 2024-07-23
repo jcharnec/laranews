@@ -9,13 +9,27 @@ use Illuminate\Support\Facades\View;
 class NoticiaController extends Controller
 {
     /**
+     * Summary of __construct
+     */
+    public function __construct()
+    {
+        //ponemos el middleware auth a todos los métodos excepto:
+        // - lista de noticias
+        // --detalles de noticias
+        // - búsqueda de noticias
+        $this->middleware(['verified'])->except('index', 'show', 'search');
+
+        // el método para eliminar una noticia requiere confirmación de clave
+        $this->middleware('password.confirm')->only('destroy');
+    }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(8);
+        $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(9);
         $total = Noticia::count();
 
         return View::make('noticias.list', [

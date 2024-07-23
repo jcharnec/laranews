@@ -8,24 +8,19 @@ use App\Mail\Contact;
 
 class ContactoController extends Controller
 {
+    /**
+     * Summary of index
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
     public function index(){
         return view('contacto');
     }
-    /*
-    public function send(Request $request){
-        $mensaje = new \stdClass();
-        $mensaje->asunto = $request->asunto;
-        $mensaje->email = $request->email;
-        $mensaje->nombre = $request->nombre;
-        $mensaje->mensaje = $request->mensaje;
 
-        Mail::to('contacto@larabikes.com')->send(new Contact($mensaje));
-
-        return redirect()
-            ->route('welcome')
-            ->with('success', 'Mensaje enviado correctamente');
-    }
-    */
+    /**
+     * Summary of send
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function send(Request $request){
         $request->validate([
             'email' => 'required|email:rfc',
