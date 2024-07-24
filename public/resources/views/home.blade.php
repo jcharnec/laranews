@@ -45,58 +45,26 @@
                 <tr>
                     <td>{{ $noticia->id }}</td>
                     <td class="text-center" style="max-width: 80px">
-                        <img class="rounded" style="max-width: 80%" alt="Imagen de {{ $noticia->titulo }}" title="Imagen de {{ $noticia->titulo }}" src="{{ $noticia->imagen ? asset('storage/images/noticias/' . $noticia->imagen) : asset('storage/images/noticias/default.jpg') }}">
+                        <img class="rounded" style="max-width: 80%" 
+                            alt="Imagen de {{ $noticia->titulo }}" 
+                            title="Imagen de {{ $noticia->titulo }}" 
+                            src="{{ $noticia->imagen ? 
+                            asset('storage/'.config('filesystems.bikesImageDir')).'/'. $noticia->imagen: 
+                            asset('storage/'.config('filesystems.bikesImageDir')).'/default.jpg'}}">
                     </td>
                     <td>{{ $noticia->titulo }}</td>
                     <td>{{ $noticia->tema }}</td>
                     <td class="text-center">
                         <a href="{{ route('noticias.show', $noticia->id) }}">
-                            <button class="btn btn-primary">Ver detalles</button>
-                        </a>
+                            <img height="20" width="20" alt="Ver detalles" title="Ver detalles" src="{{asset('images/buttons/show.svg')}}"></a>
                         <a href="{{ route('noticias.edit', $noticia->id) }}">
-                            <button class="btn btn-warning">Editar</button>
-                        </a>
+                            <img height="20" width="20" alt="Modificar" title="Modificar" src="{{asset('images/buttons/edit.svg')}}"></a>
                         <a href="{{ route('noticias.delete', $noticia->id) }}">
-                            <button class="btn btn-danger">Eliminar</button>
-                        </a>
+                            <img height="20" width="20" alt="Borrar" title="Borrar" src="{{asset('images/buttons/delete.svg')}}"></a>
                     </td>
                 </tr>
                 @endforeach
             </table>
-            @if(count($deletedNoticias))
-            <h3 class="mt-4">Noticias borradas</h3>
-            <table class="table table-striped table-bordered">
-                <tr>
-                    <th>ID</th>
-                    <th>Imagen</th>
-                    <th>Título</th>
-                    <th>Tema</th>
-                    <th>Operaciones</th>
-                </tr>
-                @foreach($deletedNoticias as $noticia)
-                <tr>
-                    <td><b>#{{ $noticia->id }}</b></td>
-                    <td class="text-center" style="max-width: 80px">
-                        <img class="rounded" style="max-width: 80%" alt="Imagen de {{ $noticia->titulo }}" title="Imagen de {{ $noticia->titulo }}" src="{{ $noticia->imagen ? asset('storage/images/noticias/' . $noticia->imagen) : asset('storage/images/noticias/default.jpg') }}">
-                    </td>
-                    <td>{{ $noticia->titulo }}</td>
-                    <td>{{ $noticia->tema }}</td>
-                    <td class="text-center">
-                        <form method="POST" action="{{ route('noticias.restore', $noticia->id) }}">
-                            @csrf
-                            <button class="btn btn-success">Restaurar</button>
-                        </form>
-                        <form method="POST" action="{{ route('noticias.purge') }}">
-                            @csrf
-                            <input type="hidden" name="_method" value="DELETE">
-                            <input name="noticia_id" type="hidden" value="{{ $noticia->id }}">
-                            <button class="btn btn-danger">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </table>
-            @endif
         </div>
     </div>
 </div>

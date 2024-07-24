@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Noticia;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -21,8 +23,17 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function index()
+
+    public function index(Request $request)
     {
-        return view('home');
+        $user = $request->user();
+        $noticias = $request->user()->noticias()->paginate(config('pagination.noticias', 10));
+        //$deletedBikes = $request->user()->bikes()->onlyTrashed()->get();
+
+        return view('home', [
+            'users' => $user,
+            'noticias' => $noticias,
+            //'deleteBikes' => $deletedBikes,
+        ]);
     }
 }

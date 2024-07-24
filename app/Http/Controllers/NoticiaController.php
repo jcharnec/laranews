@@ -4,12 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Noticia;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\NoticiaRequest;
+use App\Http\Requests\NoticiaUpdateRequest;
 
 class NoticiaController extends Controller
 {
@@ -34,6 +37,7 @@ class NoticiaController extends Controller
      */
     public function index(Request $request)
     {
+        
         $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(9);
 
         return View::make('noticias.list', [
@@ -82,15 +86,8 @@ class NoticiaController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(NoticiaRequest $request)
     {
-        $request->validate([
-            'titulo' => 'required|max:255',
-            'tema' => 'required|max:255',
-            'texto' => 'required',
-            'imagen' => 'nullable|image',
-        ]);
-
         $noticia = new Noticia();
         $noticia->titulo = $request->titulo;
         $noticia->tema = $request->tema;
@@ -104,8 +101,9 @@ class NoticiaController extends Controller
             $noticia->imagen = basename($path);
         }
 
-        $noticia->user_id = Auth::id();
-        $noticia->save();
+        $datos['user_id'] = $request->user()->id;
+        
+        $noticia = Noticia::create($datos);
 
         return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
     }
@@ -156,31 +154,34 @@ class NoticiaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Noticia $noticia)
+    public function update(NoticiaUpdateRequest $request, Noticia $noticia)
     {
         //
     }
 
-    public function delete($id)
+    public function delete(Request $request, Noticia $noticia)
     {
-        //recupera la noticia
-        $noticia = Noticia::findOrFail($id);
+        //autorización mediante policy
+        if($request->user()->cant('delete', $noticia))
+            abort(401, 'No puedes borrar una noticia que no es tuya!');
 
         //muestra la vista de confirmación de eliminación
         return view('noticias.delete', [
             'noticia' => $noticia
         ]);
     }
+
     /**
      * Remove the specified resource from storage.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, Noticia $noticia)
     {
-        //busca la noticia seleccionada
-        $noticia = Noticia::findOrFail($id);
+        //autorización mediante policy
+        if($request->user()->cant('delete', $noticia))
+            abort(401, 'No puedes borrar una noticia que no es tuya!');
 
         //comporbar la validez de la firma de la URL
         if (!$request->hasValidSignature())
