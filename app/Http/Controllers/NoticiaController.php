@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Noticia;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Auth;
 
 class NoticiaController extends Controller
 {
@@ -99,6 +104,7 @@ class NoticiaController extends Controller
             $noticia->imagen = basename($path);
         }
 
+        $noticia->user_id = Auth::id();
         $noticia->save();
 
         return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
@@ -186,5 +192,71 @@ class NoticiaController extends Controller
         //redirige a la lista de motos
         return redirect()->route('noticias.index')
             ->with('success', 'La noticia ha sido eliminada');
+    }
+
+    /**
+     * Summary of restore
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function restore(Request $request, int $id)
+    {
+        // Recuperar la noticia borrada
+        $noticia = Noticia::withTrashed()->findOrFail($id);
+
+        // Verificar permisos usando la política de restauración
+        if ($request->user()->cant('restore', $noticia)) {
+            throw new AuthorizationException('No tienes permiso');
+        }
+
+        // Restaurar la moto
+        $noticia->restore();
+
+        // Redirigir a la página anterior con un mensaje de éxito
+        return back()->with('success', "Noticia $noticia->titulo restaurada correctamente.");
+    }
+
+    /**
+     * Summary of purge
+     * @param \Illuminate\Http\Request $request
+     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function purge(Request $request)
+    {
+        //recuperar la noticia borrada
+        $noticia = Noticia::withTrashed()->findOrFail($request->input('noticia_id'));
+
+        //comprobar los permisos mediante la policy
+        if ($request->user()->cant('delete', $noticia))
+            throw new AuthorizationException('No tienes permiso');
+
+        // si se consigue eliminar definitivamente la noticia y ésta tiene foto...
+        if ($noticia->forceDelete() && $noticia->imagen)
+            // ... se elimina el fichero
+            Storage::delete(config('filesystems.bikesImageDir') . '/' . $noticia->imagen);
+
+        return back()->with(
+            'success',
+            "Noticia $noticia->titulo eliminada definitivamente."
+        );
+    }
+
+        /**
+     * Método para mostrar las noticias del usuario
+     */
+    public function userNoticias()
+    {
+        $user = Auth::user();
+        $noticias = Noticia::where('user_id', $user->id)->get();
+        $deletedNoticias = Noticia::onlyTrashed()->where('user_id', $user->id)->get();
+
+        return view('home', [
+            'user' => $user,
+            'noticias' => $noticias,
+            'deletedNoticias' => $deletedNoticias
+        ]);
     }
 }

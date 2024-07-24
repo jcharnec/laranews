@@ -56,6 +56,9 @@ Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 Route::get('/contacto', [ContactoController::class, 'index'])->name('contacto');
 Route::post('/contacto', [ContactoController::class, 'send'])->name('contacto.email');
 
+Route::post('/noticias/{id}/restore', [NoticiaController::class, 'restore'])->name('noticias.restore');
+Route::delete('/noticias/purge', [NoticiaController::class, 'purge'])->name('noticias.purge');
+
 // CRUD de noticias
 Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create');
 Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');
@@ -72,6 +75,3 @@ Route::get('/home', [HomeController::class, 'index'])->name('home');
 // Ruta de fallback
 Route::fallback([WelcomeController::class, 'index']);
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
