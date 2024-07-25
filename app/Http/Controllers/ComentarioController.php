@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Comentario;
+use App\Models\Noticia;
+use App\Http\Requests\ComentarioRequest;
 
 class ComentarioController extends Controller
 {
@@ -32,9 +35,14 @@ class ComentarioController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ComentarioRequest $request, Noticia $noticia)
     {
-        //
+        $request->user()->comentarios()->create([
+            'texto' => $request->texto,
+            'noticia_id' => $noticia->id,
+        ]);
+
+        return redirect()->route('noticias.show', $noticia->id)->with('success', 'Comentario añadido correctamente.');
     }
 
     /**
@@ -54,9 +62,11 @@ class ComentarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Comentario $comentario)
     {
-        //
+        $this->authorize('update', $comentario);
+
+        return view('comentarios.edit', compact('comentario'));
     }
 
     /**
@@ -66,9 +76,13 @@ class ComentarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(ComentarioRequest $request, Comentario $comentario)
     {
-        //
+        $this->authorize('update', $comentario);
+
+        $comentario->update($request->only('texto'));
+
+        return redirect()->route('noticias.show', $comentario->noticia_id)->with('success', 'Comentario actualizado correctamente.');
     }
 
     /**
@@ -77,8 +91,12 @@ class ComentarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Comentario $comentario)
     {
-        //
+        $this->authorize('delete', $comentario);
+
+        $comentario->delete();
+
+        return back()->with('success', 'Comentario eliminado correctamente.');
     }
 }

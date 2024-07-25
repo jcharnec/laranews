@@ -9,6 +9,7 @@ use App\Http\Controllers\WelcomeController;
 use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ComentarioController;
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +51,10 @@ Route::post('/email/verification-notification', function (Request $request) {
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 // Portada
-Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
+// Redirige la raíz al índice de noticias
+Route::get('/', function () {
+        return redirect()->route('noticias.index');
+});
 
 // Ruta para el formulario de contacto
 Route::get('/contacto', [ContactoController::class, 'index'])->name('contacto');
@@ -64,14 +68,20 @@ Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noti
 Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');
 Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');
 Route::get('/noticias/search/{titulo?}/{tema?}', [NoticiaController::class, 'search'])->name('noticias.search');
-Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show');
+Route::get('/noticia/{id}', [NoticiaController::class, 'show'])->name('noticias.show');
 Route::get('/noticias/{noticia}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit');
 Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');
 Route::get('/noticias/{noticia}/delete', [NoticiaController::class, 'delete'])->name('noticias.delete');
 Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');
 
+// Rutas de comentarios
+Route::post('/noticias/{noticia}/comentarios', [ComentarioController::class, 'store'])->name('comentarios.store');
+Route::get('/comentarios/{comentario}/edit', [ComentarioController::class, 'edit'])->name('comentarios.edit');
+Route::put('/comentarios/{comentario}', [ComentarioController::class, 'update'])->name('comentarios.update');
+Route::delete('/comentarios/{comentario}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
+
+
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 // Ruta de fallback
 Route::fallback([WelcomeController::class, 'index']);
-

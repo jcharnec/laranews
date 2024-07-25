@@ -18,7 +18,7 @@ class NoticiaPolicy
      */
     public function viewAny(User $user)
     {
-        //
+        return true;
     }
 
     /**
@@ -30,7 +30,7 @@ class NoticiaPolicy
      */
     public function view(User $user, Noticia $noticia)
     {
-        //
+        return true;
     }
 
     /**
@@ -41,7 +41,8 @@ class NoticiaPolicy
      */
     public function create(User $user)
     {
-        //
+        // Solo permite crear noticias a los usuarios con el rol de 'redactor' y con correo verificado
+        return $user->hasRole(['redactor', 'administrador']) && $user->hasVerifiedEmail();
     }
 
     /**
@@ -53,9 +54,9 @@ class NoticiaPolicy
      */
     public function update(User $user, Noticia $noticia)
     {
-        //true si el usuario es el propietario o tiene uno de los roles
-        return  $user->isOwner($noticia) ||
-            $user->hasRole(['admin', 'editor']);
+        // Permitir la actualización si el usuario es propietario o tiene el rol de administrador y tiene correo verificado
+        return ($user->isOwner($noticia) 
+            || $user->hasRole('administrador')) && $user->hasVerifiedEmail();
     }
 
     /**
@@ -67,9 +68,9 @@ class NoticiaPolicy
      */
     public function delete(User $user, Noticia $noticia)
     {
-        //true si el usuario es el propietario o tiene uno de los roles
-        return  $user->isOwner($noticia) ||
-            $user->hasRole(['admin', 'editor']);
+        // Permitir la eliminación si el usuario es propietario o tiene el rol de administrador o editor y tiene correo verificado
+        return ($user->isOwner($noticia) 
+            || $user->hasRole(['administrador', 'editor'])) && $user->hasVerifiedEmail();
     }
 
     /**
@@ -81,9 +82,9 @@ class NoticiaPolicy
      */
     public function restore(User $user, Noticia $noticia)
     {
-        //true si el usuario es el propietario o tiene uno de los roles
-        return  $user->isOwner($noticia) ||
-            $user->hasRole(['admin', 'editor']);
+        // Permitir la restauración si el usuario es propietario o tiene el rol de administrador o editor y tiene correo verificado
+        return ($user->isOwner($noticia) 
+            || $user->hasRole(['administrador', 'editor'])) && $user->hasVerifiedEmail();
     }
 
     /**
@@ -95,6 +96,7 @@ class NoticiaPolicy
      */
     public function forceDelete(User $user, Noticia $noticia)
     {
-        //
+        // Permitir la eliminación permanente si el usuario tiene el rol de administrador y tiene correo verificado
+        return $user->hasRole('administrador') && $user->hasVerifiedEmail();
     }
 }

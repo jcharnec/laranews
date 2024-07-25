@@ -29,9 +29,6 @@
                     <div class="container">
                         <ul class="nav nav-pills my-3">
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{ $pagina == 'portada' ? 'active' : '' }}" href="{{ route('welcome') }}">Inicio</a>
-                            </li>
-                            <li class="nav-item mr-2">
                                 <a class="nav-link {{ $pagina == 'noticias.index' || $pagina == 'noticias.search' ? 'active' : '' }}" href="{{ route('noticias.index') }}">Noticias</a>
                             </li>
                             <li class="nav-item mr-2">
@@ -45,11 +42,13 @@
 
                             @auth
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Mis noticias</a>
+                                <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                             </li>
+                            @if (Auth::user()->hasRole('redactor'))
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{ $pagina == 'noticias.create' ? 'active' : '' }}" href="{{ action([App\Http\Controllers\NoticiaController::class, 'create']) }}">Nueva noticia</a>
+                                <a class="nav-link {{ $pagina == 'noticias.create' ? 'active' : '' }}" href="{{ route('noticias.create') }}">Nueva noticia</a>
                             </li>
+                            @endif
                             @if(Auth::user()->hasRole('administrador'))
                             <li class="nav-item mr-2">
                                 <a class="nav-link {{ $pagina == 'admin.deleted.noticias' ? 'active' : '' }}" href="{{ route('admin.deleted.noticias') }}">Noticias borradas</a>
@@ -132,7 +131,6 @@
             <div class="btn-group" role="group" aria-label="links">
                 @section('enlaces')
                 <a href="{{ url()->previous() }}" class="btn btn-primary m-2">Atrás</a>
-                <a href="{{ route('welcome') }}" class="btn btn-primary m-2">Inicio</a>
                 @show
             </div>
         </div>

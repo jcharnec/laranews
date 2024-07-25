@@ -13,7 +13,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'name', 'email', 'password', 'population', 'postal_code', 'birthdate', 'imagen'
+        'name', 'email', 'password', 'imagen'
     ];
 
     protected $hidden = [
@@ -27,6 +27,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function noticias()
     {
         return $this->hasMany(Noticia::class);
+    }
+
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class);
     }
 
     public function roles()

@@ -32,10 +32,10 @@
                     </div>
                 </div>
             </div>
+
             <h3>Noticias de {{ $user->name }}</h3>
             <table class="table table-striped table-bordered">
                 <tr>
-                    <th>ID</th>
                     <th>Imagen</th>
                     <th>Título</th>
                     <th>Tema</th>
@@ -43,14 +43,13 @@
                 </tr>
                 @foreach($noticias as $noticia)
                 <tr>
-                    <td>{{ $noticia->id }}</td>
                     <td class="text-center" style="max-width: 80px">
                         <img class="rounded" style="max-width: 80%" 
                             alt="Imagen de {{ $noticia->titulo }}" 
                             title="Imagen de {{ $noticia->titulo }}" 
                             src="{{ $noticia->imagen ? 
-                            asset('storage/'.config('filesystems.bikesImageDir')).'/'. $noticia->imagen: 
-                            asset('storage/'.config('filesystems.bikesImageDir')).'/default.jpg'}}">
+                            asset('storage/images/noticias/'. $noticia->imagen): 
+                            asset('storage/images/noticias/default.jpg')}}">
                     </td>
                     <td>{{ $noticia->titulo }}</td>
                     <td>{{ $noticia->tema }}</td>
@@ -61,6 +60,30 @@
                             <img height="20" width="20" alt="Modificar" title="Modificar" src="{{asset('images/buttons/edit.svg')}}"></a>
                         <a href="{{ route('noticias.delete', $noticia->id) }}">
                             <img height="20" width="20" alt="Borrar" title="Borrar" src="{{asset('images/buttons/delete.svg')}}"></a>
+                    </td>
+                </tr>
+                @endforeach
+            </table>
+
+            <h3>Comentarios de {{ $user->name }}</h3>
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>Noticia</th>
+                    <th>Comentario</th>
+                    <th>Operaciones</th>
+                </tr>
+                @foreach($comentarios as $comentario)
+                <tr>
+                    <td><a href="{{ route('noticias.show', $comentario->noticia->id) }}">{{ $comentario->noticia->titulo }}</a></td>
+                    <td>{{ $comentario->texto }}</td>
+                    <td class="text-center">
+                        <a href="#" onclick="event.preventDefault(); if(confirm('¿Seguro que quieres eliminar este comentario?')) { document.getElementById('delete-comentario-{{ $comentario->id }}').submit(); }">
+                            <img height="20" width="20" alt="Borrar" title="Borrar" src="{{asset('images/buttons/delete.svg')}}">
+                        </a>
+                        <form id="delete-comentario-{{ $comentario->id }}" action="{{ route('comentarios.destroy', $comentario->id) }}" method="POST" style="display:none;">
+                            @csrf
+                            @method('DELETE')
+                        </form>
                     </td>
                 </tr>
                 @endforeach

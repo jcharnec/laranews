@@ -27,7 +27,7 @@ class NoticiaRequest extends FormRequest
             'titulo' => 'required|max:255',
             'tema' => 'required|max:255',
             'texto' => 'required',
-            'imagen' => 'sometimes|file|image|mimes:jpg, png, gif, webp|max:2048',
+            'imagen' => 'sometimes|file|image|mimes:jpg,png,gif,webp|max:2048',
         ];
     }
 

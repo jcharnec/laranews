@@ -15,25 +15,17 @@ class CreateComentariosTable extends Migration
     {
         Schema::create('comentarios', function (Blueprint $table) {
             $table->id();
-
-            $table->string('titulo', 255);
-            $table->string('tema', 255);
-            $table->text('texto'); // Ajustado para ser tipo text
-            $table->string('imagen', 255)->nullable();
-            $table->integer('visitas');
-
-            $table->unsignedBigInteger('user_id')->nullable();
-            // Marcas de tiempo: campos created_at y updated_at
+            $table->text('texto');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('noticia_id'); // Añadir el campo noticia_id
             $table->timestamps();
-            // Marca de tiempo de borrado
-            $table->softDeletes();
-            // Campo published_at
-            $table->timestamp('published_at')->nullable();
-            // Campo rejected
-            $table->boolean('rejected')->default(false);
-            // Relaciona los dos campos
+
+            // Claves foráneas
             $table->foreign('user_id')
                 ->references('id')->on('users')
+                ->onUpdate('cascade')->onDelete('restrict');
+            $table->foreign('noticia_id')
+                ->references('id')->on('noticias')
                 ->onUpdate('cascade')->onDelete('restrict');
         });
     }
@@ -47,6 +39,7 @@ class CreateComentariosTable extends Migration
     {
         Schema::table('comentarios', function (Blueprint $table) {
             $table->dropForeign('comentarios_user_id_foreign');
+            $table->dropForeign('comentarios_noticia_id_foreign'); // Añadir esta línea para borrar la clave foránea
         });
         Schema::dropIfExists('comentarios');
     }

@@ -27,13 +27,13 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        $noticias = $request->user()->noticias()->paginate(config('pagination.noticias', 10));
-        //$deletedBikes = $request->user()->bikes()->onlyTrashed()->get();
+        $noticias = $user->noticias()->paginate(10);
+        $comentarios = $user->comentarios()->with('noticia')->paginate(10);
 
         return view('home', [
-            'users' => $user,
+            'user' => $user,
             'noticias' => $noticias,
-            //'deleteBikes' => $deletedBikes,
+            'comentarios' => $comentarios,
         ]);
     }
 }

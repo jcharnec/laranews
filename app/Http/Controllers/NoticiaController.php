@@ -37,7 +37,7 @@ class NoticiaController extends Controller
      */
     public function index(Request $request)
     {
-        
+
         $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(9);
 
         return View::make('noticias.list', [
@@ -76,6 +76,7 @@ class NoticiaController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Noticia::class);
         // mostrar formulario
         return view('noticias.create');
     }
@@ -88,22 +89,25 @@ class NoticiaController extends Controller
      */
     public function store(NoticiaRequest $request)
     {
-        $noticia = new Noticia();
-        $noticia->titulo = $request->titulo;
-        $noticia->tema = $request->tema;
-        $noticia->texto = $request->texto;
-        $noticia->visitas = 0; // Inicializa visitas a 0
-        $noticia->published_at = null; // Dejar null hasta que sea revisada
-        $noticia->rejected = false; // Inicializa rejected a false
+        $datos = $request->only([
+            'titulo', 'tema', 'texto'
+        ]);
+
+        $datos += ['visitas' => 0];
+        $datos += ['published_at' => null];
+        $datos += ['rejected' => false];
+        $datos['imagen'] = NULL;
 
         if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('public/images/noticias');
-            $noticia->imagen = basename($path);
+            //sube la imagen al directorio indicando en el fichero de config
+            $ruta = $request->file('imagen')->store(config('filesystems.noticiasImageDir'));
+            //nos quedamos solo con el nombre del fichero para añadirlo a la BDD
+            $datos['imagen'] = pathinfo($ruta, PATHINFO_BASENAME);
         }
 
         $datos['user_id'] = $request->user()->id;
-        
-        $noticia = Noticia::create($datos);
+
+        Noticia::create($datos);
 
         return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
     }
@@ -117,15 +121,14 @@ class NoticiaController extends Controller
      */
     public function show($id)
     {
-        //recupera la noticia con el id deseado
-        //si no la recuera generará un error 404
+        // Recupera la noticia con el id deseado, generando un error 404 si no la encuentra
         $noticia = Noticia::findOrFail($id);
 
-        //carga la vista correspondiente y le pasa la noticia
-        return view('noticias.show', [
-            '
-            noticia' => $noticia
-        ]);
+        // Incrementa el contador de visitas
+        $noticia->increment('visitas');
+
+        // Carga la vista correspondiente y le pasa la noticia
+        return view('noticias.show', ['noticia' => $noticia]);
     }
 
 
@@ -135,34 +138,63 @@ class NoticiaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Noticia $noticia)
     {
-        //recupera la noticia con el id deseado
-        //si no la recuera generará un error 404
-        $noticia = Noticia::findOrFail($id);
-
-        //carga la vista correspondiente y le pasa la noticia
         return view('noticias.update', [
-            'noticia', $noticia
+            'noticia' => $noticia
         ]);
     }
+    
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(NoticiaUpdateRequest $request, Noticia $noticia)
-    {
-        //
+/**
+ * Update the specified resource in storage.
+ *
+ * @param  \App\Http\Requests\NoticiaUpdateRequest  $request
+ * @param  \App\Models\Noticia  $noticia
+ * @return \Illuminate\Http\Response
+ */
+public function update(NoticiaUpdateRequest $request, Noticia $noticia)
+{
+    $datos = $request->only([
+        'titulo', 'tema', 'texto'
+    ]);
+
+    // si llega nueva imagen...
+    if ($request->hasFile('imagen')) {
+        // Borra la imagen anterior si existe
+        if ($noticia->imagen)
+            $aBorrar = config('filesystems.noticiasImageDir') . '/' . $noticia->imagen;
+
+        // sube la imagen al directorio indicado en el fichero de config
+        $imagenNueva = $request->file('imagen')->store(config('filesystems.noticiasImageDir'));
+
+        // nos quedamos solo con el nombre del fichero para añadirlo a la BDD
+        $datos['imagen'] = pathinfo($imagenNueva, PATHINFO_BASENAME);
     }
+
+    // en caso de que nos pidan eliminar la imagen
+    if ($request->filled('eliminarimagen') && $noticia->imagen) {
+        $datos['imagen'] = NULL;
+        $aBorrar = config('filesystems.noticiasImageDir') . '/' . $noticia->imagen;
+    }
+
+    // al actualizar debemos tener en cuenta varias cosas
+    if ($noticia->update($datos)) {
+        if (isset($aBorrar))
+            Storage::delete($aBorrar);
+    } else {
+        if (isset($imagenNueva))
+            Storage::delete($imagenNueva);
+    }
+
+    return redirect()->route('noticias.index')->with('success', 'Noticia actualizada exitosamente.');
+}
+
 
     public function delete(Request $request, Noticia $noticia)
     {
         //autorización mediante policy
-        if($request->user()->cant('delete', $noticia))
+        if ($request->user()->cant('delete', $noticia))
             abort(401, 'No puedes borrar una noticia que no es tuya!');
 
         //muestra la vista de confirmación de eliminación
@@ -180,7 +212,7 @@ class NoticiaController extends Controller
     public function destroy(Request $request, Noticia $noticia)
     {
         //autorización mediante policy
-        if($request->user()->cant('delete', $noticia))
+        if ($request->user()->cant('delete', $noticia))
             abort(401, 'No puedes borrar una noticia que no es tuya!');
 
         //comporbar la validez de la firma de la URL
@@ -237,7 +269,7 @@ class NoticiaController extends Controller
         // si se consigue eliminar definitivamente la noticia y ésta tiene foto...
         if ($noticia->forceDelete() && $noticia->imagen)
             // ... se elimina el fichero
-            Storage::delete(config('filesystems.bikesImageDir') . '/' . $noticia->imagen);
+            Storage::delete(config('filesystems.noticiasImageDir') . '/' . $noticia->imagen);
 
         return back()->with(
             'success',
@@ -245,7 +277,7 @@ class NoticiaController extends Controller
         );
     }
 
-        /**
+    /**
      * Método para mostrar las noticias del usuario
      */
     public function userNoticias()

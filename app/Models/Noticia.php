@@ -43,4 +43,13 @@ class Noticia extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Summary of comentarios
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function comentarios()
+    {
+        return $this->hasMany(Comentario::class);
+    }
 }
