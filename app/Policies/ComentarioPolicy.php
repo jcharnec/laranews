@@ -66,7 +66,8 @@ class ComentarioPolicy
 
     public function delete(User $user, Comentario $comentario)
     {
-        return $user->id === $comentario->user_id && $user->hasVerifiedEmail();
+        return $user->id === $comentario->user_id && $user->hasVerifiedEmail() ||
+            $user->hasRole('administrador');
     }
 
     /**
@@ -92,5 +93,5 @@ class ComentarioPolicy
     {
         return $user->id === $comentario->user_id && $user->hasVerifiedEmail();
     }
-    
+
 }
