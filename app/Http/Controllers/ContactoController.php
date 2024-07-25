@@ -39,7 +39,7 @@ class ContactoController extends Controller
         
         Mail::to('contacto@larabikes.com')->send(new Contact($mensaje));
 
-        return redirect()->route('welcome')->with('success', 'Mensaje enviado correctamente.');
+        return redirect()->route('noticias.index')->with('success', 'Mensaje enviado correctamente.');
 
     }
 }

@@ -8,7 +8,7 @@
         <div class="col-md-10">
             <h1 class="mb-3">{{ $noticia->titulo }}</h1>
             <p class="text-muted">Tema: {{ $noticia->tema }}</p>
-            <p class="text-muted">Autor: {{ $noticia->user ? $noticia->user->name : 'Sin autor' }} | Visitas: {{ $noticia->visitas }} | Fecha de Publicación: {{ $noticia->published_at ?? 'No publicada' }}</p>
+            <p class="text-muted">Autor: {{ $noticia->user ? $noticia->user->name : 'Sin autor' }} | Visitas: {{ $noticia->visitas }} | Fecha de Publicación: {{ $noticia->updated_at ?? $noticia->created_at }} </p>
             <hr>
             <div class="text-center mb-4">
                 <img class="rounded img-fluid" alt="Imagen de {{ $noticia->titulo }}" title="Imagen de {{ $noticia->titulo }}" src="{{ $noticia->imagen ? asset('storage/images/noticias/' . $noticia->imagen) : asset('storage/images/noticias/default.jpg') }}">
@@ -43,16 +43,13 @@
                     <p class="text-muted">{{ $comentario->user->name }} - {{ $comentario->created_at }}</p>
                 </div>
                 <div>
-                    @can('update', $comentario)
-                    <a href="{{ route('comentarios.edit', $comentario->id) }}" class="btn btn-primary btn-sm">
-                        Editar
-                    </a>
-                    @endcan
                     @can('delete', $comentario)
                     <form action="{{ route('comentarios.destroy', $comentario->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            <img height="20" width="20" alt="Borrar" title="Borrar" src="{{ asset('images/buttons/delete.svg') }}">
+                        </button>
                     </form>
                     @endcan
                 </div>

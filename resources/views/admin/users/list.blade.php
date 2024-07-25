@@ -32,7 +32,7 @@
         </tr>
         @foreach ($users as $u)
         <tr>
-            <td class="text-center">#<b>{{$u->id}}</b></td>
+            <td class="text-center"><b>{{$u->id}}</b></td>
             <td>
                 <a href="{{route('admin.user.show', $u->id)}}"><b>{{ $u->name }}</b></a>
             </td>

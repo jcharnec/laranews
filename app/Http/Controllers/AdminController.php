@@ -29,7 +29,7 @@ class AdminController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function userList(){
-        $users = User::orderBy('name', 'ASC')
+        $users = User::orderBy('id', 'DESC')
             ->paginate(config('pagination.users', 10));
 
         return view('admin.users.list', ['users' => $users]);

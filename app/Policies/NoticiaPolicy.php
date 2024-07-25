@@ -55,7 +55,7 @@ class NoticiaPolicy
     public function update(User $user, Noticia $noticia)
     {
         // Permitir la actualización si el usuario es propietario o tiene el rol de administrador y tiene correo verificado
-        return ($user->isOwner($noticia) && $user->hasVerifiedEmail();
+        return $user->isOwner($noticia) && $user->hasVerifiedEmail();
     }
 
     /**
@@ -69,7 +69,7 @@ class NoticiaPolicy
     {
         // Permitir la eliminación si el usuario es propietario o tiene el rol de administrador o editor y tiene correo verificado
         return ($user->isOwner($noticia) 
-            || $user->hasRole(['administrador', 'editor'])) && $user->hasVerifiedEmail();
+            || $user->hasRole(['editor'])) && $user->hasVerifiedEmail();
     }
 
     /**

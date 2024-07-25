@@ -51,10 +51,6 @@
                             @endif
                             @if(Auth::user()->hasRole('administrador'))
                             <li class="nav-item mr-2">
-                                <a class="nav-link {{ $pagina == 'admin.deleted.noticias' ? 'active' : '' }}" href="{{ route('admin.deleted.noticias') }}">Noticias borradas</a>
-                            </li>
-
-                            <li class="nav-item mr-2">
                                 <a class="nav-link {{ $pagina == 'admin.users' || $pagina == 'admin.users.search' ? 'active' : '' }}" href="{{ route('admin.users') }}">Gestión de usuarios</a>
                             </li>
                             @endif
