@@ -144,51 +144,51 @@ class NoticiaController extends Controller
             'noticia' => $noticia
         ]);
     }
-    
 
-/**
- * Update the specified resource in storage.
- *
- * @param  \App\Http\Requests\NoticiaUpdateRequest  $request
- * @param  \App\Models\Noticia  $noticia
- * @return \Illuminate\Http\Response
- */
-public function update(NoticiaUpdateRequest $request, Noticia $noticia)
-{
-    $datos = $request->only([
-        'titulo', 'tema', 'texto'
-    ]);
 
-    // si llega nueva imagen...
-    if ($request->hasFile('imagen')) {
-        // Borra la imagen anterior si existe
-        if ($noticia->imagen)
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \App\Http\Requests\NoticiaUpdateRequest  $request
+     * @param  \App\Models\Noticia  $noticia
+     * @return \Illuminate\Http\Response
+     */
+    public function update(NoticiaUpdateRequest $request, Noticia $noticia)
+    {
+        $datos = $request->only([
+            'titulo', 'tema', 'texto'
+        ]);
+
+        // si llega nueva imagen...
+        if ($request->hasFile('imagen')) {
+            // Borra la imagen anterior si existe
+            if ($noticia->imagen)
+                $aBorrar = config('filesystems.noticiasImageDir') . '/' . $noticia->imagen;
+
+            // sube la imagen al directorio indicado en el fichero de config
+            $imagenNueva = $request->file('imagen')->store(config('filesystems.noticiasImageDir'));
+
+            // nos quedamos solo con el nombre del fichero para añadirlo a la BDD
+            $datos['imagen'] = pathinfo($imagenNueva, PATHINFO_BASENAME);
+        }
+
+        // en caso de que nos pidan eliminar la imagen
+        if ($request->filled('eliminarimagen') && $noticia->imagen) {
+            $datos['imagen'] = NULL;
             $aBorrar = config('filesystems.noticiasImageDir') . '/' . $noticia->imagen;
+        }
 
-        // sube la imagen al directorio indicado en el fichero de config
-        $imagenNueva = $request->file('imagen')->store(config('filesystems.noticiasImageDir'));
+        // al actualizar debemos tener en cuenta varias cosas
+        if ($noticia->update($datos)) {
+            if (isset($aBorrar))
+                Storage::delete($aBorrar);
+        } else {
+            if (isset($imagenNueva))
+                Storage::delete($imagenNueva);
+        }
 
-        // nos quedamos solo con el nombre del fichero para añadirlo a la BDD
-        $datos['imagen'] = pathinfo($imagenNueva, PATHINFO_BASENAME);
+        return redirect()->route('noticias.index')->with('success', 'Noticia actualizada exitosamente.');
     }
-
-    // en caso de que nos pidan eliminar la imagen
-    if ($request->filled('eliminarimagen') && $noticia->imagen) {
-        $datos['imagen'] = NULL;
-        $aBorrar = config('filesystems.noticiasImageDir') . '/' . $noticia->imagen;
-    }
-
-    // al actualizar debemos tener en cuenta varias cosas
-    if ($noticia->update($datos)) {
-        if (isset($aBorrar))
-            Storage::delete($aBorrar);
-    } else {
-        if (isset($imagenNueva))
-            Storage::delete($imagenNueva);
-    }
-
-    return redirect()->route('noticias.index')->with('success', 'Noticia actualizada exitosamente.');
-}
 
 
     public function delete(Request $request, Noticia $noticia)
@@ -291,5 +291,44 @@ public function update(NoticiaUpdateRequest $request, Noticia $noticia)
             'noticias' => $noticias,
             'deletedNoticias' => $deletedNoticias
         ]);
+    }
+
+    /**
+     * Listar noticias pendientes.
+     */
+    public function pendientes()
+    {
+        $this->authorize('viewPending', Noticia::class);
+
+        $noticiasPendientes = Noticia::whereNull('published_at')
+            ->where('rejected', false)
+            ->get();
+
+        return view('noticias.pendientes', ['noticias' => $noticiasPendientes]);
+    }
+
+
+    /**
+     * Aprobar noticia.
+     */
+    public function aprobar(Request $request, Noticia $noticia)
+    {
+        $this->authorize('approve', $noticia);
+
+        $noticia->update(['published_at' => now(), 'rejected_at' => null]);
+
+        return redirect()->route('noticias.pendiente')->with('success', 'Noticia aprobada y publicada.');
+    }
+
+    /**
+     * Rechazar noticia.
+     */
+    public function rechazar(Request $request, Noticia $noticia)
+    {
+        $this->authorize('reject', $noticia);
+
+        $noticia->update(['rejected_at' => now()]);
+
+        return redirect()->route('noticias.pendiente')->with('success', 'Noticia rechazada.');
     }
 }

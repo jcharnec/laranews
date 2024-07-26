@@ -49,6 +49,11 @@
                                 <a class="nav-link {{ $pagina == 'noticias.create' ? 'active' : '' }}" href="{{ route('noticias.create') }}">Nueva noticia</a>
                             </li>
                             @endif
+                            @if (Auth::user()->hasRole('editor'))
+                            <li class="nav-item mr-2">
+                                <a class="nav-link {{ $pagina == 'noticias.pendiente' ? 'active' : '' }}" href="{{ route('noticias.pendiente') }}">Noticias pendientes</a>
+                            </li>
+                            @endif
                             @if(Auth::user()->hasRole('administrador'))
                             <li class="nav-item mr-2">
                                 <a class="nav-link {{ $pagina == 'admin.users' || $pagina == 'admin.users.search' ? 'active' : '' }}" href="{{ route('admin.users') }}">Gestión de usuarios</a>

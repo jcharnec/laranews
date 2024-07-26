@@ -68,7 +68,7 @@ class NoticiaPolicy
     public function delete(User $user, Noticia $noticia)
     {
         // Permitir la eliminación si el usuario es propietario o tiene el rol de administrador o editor y tiene correo verificado
-        return ($user->isOwner($noticia) 
+        return ($user->isOwner($noticia)
             || $user->hasRole(['editor'])) && $user->hasVerifiedEmail();
     }
 
@@ -82,7 +82,7 @@ class NoticiaPolicy
     public function restore(User $user, Noticia $noticia)
     {
         // Permitir la restauración si el usuario es propietario o tiene el rol de administrador o editor y tiene correo verificado
-        return ($user->isOwner($noticia) 
+        return ($user->isOwner($noticia)
             || $user->hasRole(['administrador', 'editor'])) && $user->hasVerifiedEmail();
     }
 
@@ -97,5 +97,37 @@ class NoticiaPolicy
     {
         // Permitir la eliminación permanente si el usuario tiene el rol de administrador y tiene correo verificado
         return $user->hasRole('administrador') && $user->hasVerifiedEmail();
+    }
+
+    /**
+     * Summary of viewPending
+     * @param \App\Models\User $user
+     * @return bool
+     */
+    public function viewPending(User $user)
+    {
+        return $user->hasRole('editor');
+    }
+
+    /**
+     * Summary of approve
+     * @param \App\Models\User $user
+     * @param \App\Models\Noticia $noticia
+     * @return bool
+     */
+    public function approve(User $user, Noticia $noticia)
+    {
+        return $user->hasRole('editor');
+    }
+
+    /**
+     * Summary of reject
+     * @param \App\Models\User $user
+     * @param \App\Models\Noticia $noticia
+     * @return bool
+     */
+    public function reject(User $user, Noticia $noticia)
+    {
+        return $user->hasRole('editor');
     }
 }

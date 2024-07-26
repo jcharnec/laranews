@@ -80,6 +80,12 @@ Route::get('/comentarios/{comentario}/edit', [ComentarioController::class, 'edit
 Route::put('/comentarios/{comentario}', [ComentarioController::class, 'update'])->name('comentarios.update');
 Route::delete('/comentarios/{comentario}', [ComentarioController::class, 'destroy'])->name('comentarios.destroy');
 
+// Ruta para listar noticias pendientes
+Route::get('/noticias/pendientes', [NoticiaController::class, 'pendientes'])->name('noticias.pendiente');
+
+// Rutas para aprobar o rechazar noticias
+Route::post('/noticias/{noticia}/aprobar', [NoticiaController::class, 'aprobar'])->name('noticias.aprobar');
+Route::post('/noticias/{noticia}/rechazar', [NoticiaController::class, 'rechazar'])->name('noticias.rechazar');
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
