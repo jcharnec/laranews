@@ -2,189 +2,214 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Noticia;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 
 class NoticiaController extends Controller
 {
     /**
-     * Summary of __construct
+     * Aplica middlewares.
      */
     public function __construct()
     {
-        //ponemos el middleware auth a todos los métodos excepto:
-        // - lista de noticias
-        // --detalles de noticias
-        // - búsqueda de noticias
+        // Requiere email verificado para todo excepto listar/ver/buscar
         $this->middleware(['verified'])->except('index', 'show', 'search');
 
-        // el método para eliminar una noticia requiere confirmación de clave
+        // Confirmación de contraseña para destruir
         $this->middleware('password.confirm')->only('destroy');
     }
+
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Listado de noticias (público).
      */
     public function index(Request $request)
     {
-        $noticias = Noticia::orderByDesc('id', 'DESC')->paginate(9);
-        $total = Noticia::count();
+        $noticias = Noticia::orderByDesc('id')->paginate(9);
+        $total    = Noticia::count();
 
         return View::make('noticias.list', [
-            'noticias' => $noticias, 
-            'total' => $total,
+            'noticias' => $noticias,
+            'total'    => $total,
         ]);
     }
 
     /**
-     * Summary of search
-     * @param \Illuminate\Http\Request $request
-     * @param mixed $titulo
-     * @param mixed $tema
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * Búsqueda de noticias (público).
      */
     public function search(Request $request, $titulo = null, $tema = null)
     {
         $titulo = $titulo ?? $request->input('titulo', '');
-        $tema = $tema ?? $request->input('tema', '');
+        $tema   = $tema   ?? $request->input('tema', '');
 
-        $noticias = Noticia::where('titulo', 'LIKE', '%' . $titulo . '%')
-            ->where('tema', 'LIKE', "%$tema%")
+        $noticias = Noticia::when($titulo !== '', fn($q) => $q->where('titulo', 'LIKE', "%{$titulo}%"))
+            ->when($tema !== '', fn($q) => $q->where('tema', 'LIKE', "%{$tema}%"))
+            ->orderByDesc('id')
             ->paginate(8)
             ->appends(['titulo' => $titulo, 'tema' => $tema]);
 
         $total = Noticia::count();
 
-        return view('noticias.list', [
-            'noticias' => $noticias,
-            'titulo' => $titulo,
-            'tema' => $tema,
-            'total' => $total
-        ]);
+        return view('noticias.list', compact('noticias', 'titulo', 'tema', 'total'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Formulario de creación (requiere login verificado).
      */
     public function create()
     {
-        // mostrar formulario
-        return view('noticias.create');
+        $temas = ['Actualidad', 'Política', 'Deportes', 'Cultura', 'Tecnología', 'Economía', 'Opinión'];
+        return view('noticias.create', compact('temas'));
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * Guardar nueva noticia (requiere login verificado).
      */
     public function store(Request $request)
     {
         $request->validate([
             'titulo' => 'required|max:255',
-            'tema' => 'required|max:255',
-            'texto' => 'required',
+            'tema'   => 'required|max:255',
+            'texto'  => 'required',
             'imagen' => 'nullable|image',
         ]);
-    
+
         $noticia = new Noticia();
-        $noticia->titulo = $request->titulo;
-        $noticia->tema = $request->tema;
-        $noticia->texto = $request->texto;
-        $noticia->visitas = 0; // Inicializa visitas a 0
-        $noticia->published_at = null; // Dejar null hasta que sea revisada
-        $noticia->rejected = false; // Inicializa rejected a false
-    
+        $noticia->titulo       = $request->titulo;
+        $noticia->tema         = $request->tema;
+        $noticia->texto        = $request->texto;
+        $noticia->visitas      = 0;
+        $noticia->published_at = null;
+        $noticia->rejected     = false;
+        $noticia->user_id      = auth()->id(); // 👈 dueño
+
         if ($request->hasFile('imagen')) {
-            $path = $request->file('imagen')->store('public/images/noticias');
-            $noticia->imagen = basename($path);
+            // guarda en storage/app/public/images/noticias
+            $path = $request->file('imagen')->store('images/noticias', 'public');
+            // guardamos la ruta relativa (p.ej. images/noticias/archivo.jpg)
+            $noticia->imagen = $path;
         }
-    
+
         $noticia->save();
-    
+
         return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
     }
-    
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Ver detalles (público).
      */
     public function show($id)
     {
-        //recupera la noticia con el id deseado
-        //si no la recuera generará un error 404
         $noticia = Noticia::findOrFail($id);
 
-        //carga la vista correspondiente y le pasa la noticia
-        return view('noticias.show', ['
-            noticia' => $noticia
-        ]);
+        // (Opcional) incrementar visitas:
+        // $noticia->increment('visitas');
+
+        return view('noticias.show', compact('noticia'));
     }
 
-
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Formulario de edición (dueño o admin).
      */
     public function edit($id)
     {
-        //recupera la noticia con el id deseado
-        //si no la recuera generará un error 404
         $noticia = Noticia::findOrFail($id);
 
-        //carga la vista correspondiente y le pasa la noticia
-        return view('noticias.update', [
-            'noticia', $noticia
-        ]);
+        if (!$this->canManage($noticia)) {
+            abort(403, 'No tienes permisos para editar esta noticia.');
+        }
+
+        // Si quieres reutilizar el selector de temas:
+        $temas = ['Actualidad', 'Política', 'Deportes', 'Cultura', 'Tecnología', 'Economía', 'Opinión'];
+
+        return view('noticias.edit', compact('noticia', 'temas'));
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Actualizar noticia (dueño o admin).
      */
     public function update(Request $request, $id)
     {
-        //
-    }
-
-    public function delete($id)
-    {
-        //recupera la noticia
         $noticia = Noticia::findOrFail($id);
 
-        //muestra la vista de confirmación de eliminación
-        return view('noticias.delete', [
-            'noticia' => $noticia
+        if (!$this->canManage($noticia)) {
+            abort(403, 'No tienes permisos para actualizar esta noticia.');
+        }
+
+        $request->validate([
+            'titulo' => 'required|max:255',
+            'tema'   => 'required|max:255',
+            'texto'  => 'required',
+            'imagen' => 'nullable|image',
         ]);
+
+        $noticia->titulo = $request->titulo;
+        $noticia->tema   = $request->tema;
+        $noticia->texto  = $request->texto;
+
+        if ($request->hasFile('imagen')) {
+            // Si hay imagen previa, la borramos (si no es null)
+            if ($noticia->imagen) {
+                Storage::disk('public')->delete($noticia->imagen);
+            }
+
+            $path = $request->file('imagen')->store('images/noticias', 'public');
+            $noticia->imagen = $path; // ruta relativa
+        }
+
+        $noticia->save();
+
+        return redirect()
+            ->route('noticias.show', $noticia->id)
+            ->with('success', 'Noticia actualizada correctamente.');
     }
+
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Confirmación de borrado (muestra vista).
+     */
+    public function delete($id)
+    {
+        $noticia = Noticia::findOrFail($id);
+
+        if (!$this->canManage($noticia)) {
+            abort(403, 'No tienes permisos para eliminar esta noticia.');
+        }
+
+        return view('noticias.delete', compact('noticia'));
+    }
+
+    /**
+     * Borrar noticia (dueño o admin).
      */
     public function destroy($id)
     {
-        //busca la noticia seleccionada
         $noticia = Noticia::findOrFail($id);
 
-        // la borra de la base de datos
+        if (!$this->canManage($noticia)) {
+            abort(403, 'No tienes permisos para eliminar esta noticia.');
+        }
+
+        // Borra imagen asociada si existe
+        if ($noticia->imagen) {
+            Storage::disk('public')->delete($noticia->imagen);
+        }
+
         $noticia->delete();
 
-        //redirige a la lista de motos
         return redirect()->route('noticias.index')
             ->with('success', 'La noticia ha sido eliminada');
+    }
+
+    /**
+     * Helper de autorización: dueño o admin.
+     */
+    private function canManage(Noticia $noticia): bool
+    {
+        $user = auth()->user();
+        if (!$user) return false;
+
+        // Dueño de la noticia o rol administrador
+        return $user->id === $noticia->user_id || $user->hasRole('administrador');
     }
 }

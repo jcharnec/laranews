@@ -1,26 +1,51 @@
 @extends('layouts.master')
 
-@section('titulo', "Confirmación de borrado de $noticia->titulo")
-
 @section('contenido')
-<!-- Usamos el URL::signedRoute() y no route() para firmar las URL y que no puedan trastear
-la ruta haciendo inyecciones, también tenemos un middleware llamado signed para hacer esto -->
-<form method="post" class="my-2 border p-5" action="{{ URL::temporarySignedRoute('noticias.destroy', now()->addMinutes(1), $noticia->id) }}">
-    {{ csrf_field() }}
-    <input name="_method" type="hidden" value="DELETE">
-    <figure>
-        <figcaption>Imagen actual:</figcaption>
-        <img class="rounded" style="max-width: 400px" alt="Imagen de {{ $noticia->titulo }}" 
-            title="Imagen de {{ $noticia->titulo }}" 
-            src="{{ $noticia->imagen ? asset('storage/' . config('filesystems.noticiasImageDir') . '/' . $noticia->imagen) : asset('storage/' . config('filesystems.noticiasImageDir') . '/default.jpg') }}">
-    </figure>
-    <label for="confirmdelete">Confirmar el borrado de "{{ $noticia->titulo }}"</label>
-    <input type="submit" alt="Borrar" title="Borrar" class="btn btn-danger m-4" value="Borrar" id="confirmdelete">
-</form>
+<div class="container mt-4">
+    <div class="card border-danger shadow-sm mb-4">
+        <div class="card-header bg-danger text-white fw-bold">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Confirmar borrado
+        </div>
+
+        <div class="card-body">
+            <form method="POST" action="{{ URL::temporarySignedRoute('noticias.destroy', now()->addMinutes(1), $noticia->id) }}">
+                @csrf
+                @method('DELETE')
+
+                {{-- Imagen --}}
+                <div class="mb-3 text-center">
+                    <label class="form-label fw-bold d-block mb-2">Imagen actual:</label>
+                    <img class="img-fluid rounded"
+                        style="max-width: 400px;"
+                        alt="Imagen de {{ $noticia->titulo }}"
+                        src="{{ $noticia->image_url }}">
+                </div>
+
+                {{-- Texto de confirmación --}}
+                <p class="mt-3 fs-5 text-center">
+                    ¿Estás seguro de que deseas borrar la noticia
+                    <strong>"{{ $noticia->titulo }}"</strong>?
+                </p>
+
+                {{-- Botón --}}
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="bi bi-trash"></i> Borrar definitivamente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @endsection
 
 @section('enlaces')
 @parent
-<a href="{{ route('noticias.index') }}" class="btn btn-primary m-2">Listado de Noticias</a>
-<a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-primary m-2">Regresar a detalles de la noticia</a>
+<a href="{{ route('noticias.index') }}" class="btn btn-outline-orange m-2">
+    <i class="bi bi-card-list"></i> Noticias
+</a>
+<a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-outline-secondary m-2">
+    <i class="bi bi-arrow-left"></i> Volver a detalles
+</a>
 @endsection

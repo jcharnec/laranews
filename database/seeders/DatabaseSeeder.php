@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -18,6 +19,20 @@ class DatabaseSeeder extends Seeder
             NoticiaSeeder::class,
             RoleSeeder::class,
         ]);
+
+        // Crear usuario administrador fijo
+        $admin = User::create([
+            'name' => 'Administrador',
+            'email' => 'admin@example.com',
+            'password' => Hash::make('admin123'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Asignar el rol de administrador si existe
+        $adminRole = \App\Models\Role::where('role', 'administrador')->first();
+        if ($adminRole) {
+            $admin->roles()->attach($adminRole->id);
+        }
 
         User::factory(50)->create();
 

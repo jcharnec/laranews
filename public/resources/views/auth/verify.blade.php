@@ -1,26 +1,33 @@
 @extends('layouts.master')
 
+@section('titulo', 'Verificación de correo')
+
 @section('contenido')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Verify Your Email Address') }}</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white fw-bold">
+                Verifica tu dirección de correo electrónico
+            </div>
 
-                <div class="card-body">
-                    @if (session('resent'))
-                        <div class="alert alert-success" role="alert">
-                            {{ __('A fresh verification link has been sent to your email address.') }}
-                        </div>
-                    @endif
-
-                    {{ __('Before proceeding, please check your email for a verification link.') }}
-                    {{ __('If you did not receive the email') }},
-                    <form class="d-inline" method="POST" action="{{ route('verification.resend') }}">
-                        @csrf
-                        <button type="submit" class="btn btn-link p-0 m-0 align-baseline">{{ __('click here to request another') }}</button>.
-                    </form>
+            <div class="card-body">
+                @if (session('resent'))
+                <div class="alert alert-success alert-dismissible fade show shadow-sm rounded" role="alert">
+                    Se ha enviado un nuevo enlace de verificación a tu dirección de correo electrónico.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
                 </div>
+                @endif
+
+                <p>Antes de continuar, por favor revisa tu correo y haz clic en el enlace de verificación que te hemos enviado.</p>
+
+                <p>¿No has recibido el correo?</p>
+
+                <form method="POST" action="{{ route('verification.resend') }}">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-primary">
+                        Reenviar enlace de verificación
+                    </button>
+                </form>
             </div>
         </div>
     </div>

@@ -4,33 +4,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noticia publicada</title>
+
+    <!-- Bootstrap desde CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        @php 
-            include 'css/bootstrap.min.css';
-        @endphp
+        body {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .banner {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
     </style>
 </head>
 
-<body class="container p-3">
-    <header class="container row bg-light p-4 my-4">
-        <figure class="img-fluid col-2">
-            <img src="{{asset('images/logos/logo.png')}}" alt="logo">
-        </figure>
+<body class="container py-4">
+    <!-- Cabecera -->
+    <header class="row align-items-center bg-light p-4 mb-4 rounded shadow-sm">
+        <div class="col-auto">
+            <img src="{{ asset('images/logos/logo.png') }}" alt="Logo" class="img-fluid" style="max-width: 100px;">
+        </div>
+        <div class="col">
+            <h1 class="h4 mb-0">{{ config('app.name', 'LaraNews') }}</h1>
+        </div>
     </header>
-    <main>
-        <h1>Felicidades</h1>
-        <h2>Has publicado tu primera noticia en LaraNews!</h2>
-        <p>Tu nueva noticia {{$noticia->titulo.' '.$noticia->tema}} ya
-            aparece en los resultados.
-        </p>
-        <p>Sigue así, estás colaborando para que LaraNews
-            se convierta en la primera red
-            de usuarios de noticias de los CIFO.</p>
-        </p>
+
+    <!-- Cuerpo -->
+    <main class="banner shadow-sm mb-5">
+        <h1 class="text-success">¡Felicidades!</h1>
+        <h2 class="h5 mb-3">Has publicado tu primera noticia en <strong>LaraNews</strong></h2>
+
+        <p>Tu nueva noticia: <strong>{{ $noticia->titulo }}</strong> (tema: <em>{{ $noticia->tema }}</em>) ya aparece en los resultados del portal.</p>
+
+        <p>Sigue así. Estás colaborando a que <strong>LaraNews</strong> se convierta en la primera red de usuarios de noticias de los <strong>CIFO</strong>.</p>
     </main>
-    <footer class="page-footer font-small p-4 my-4 bg-light">
-        <p>Aplicación creada por {{ $autor }} como ejemplo de clase.</p>
-        <b>Desarrollada haciendo uso de <b>Laravel</b> y <b>Bootstrap</b>.</p>
+
+    <!-- Pie -->
+    <footer class="bg-light p-4 rounded shadow-sm text-muted">
+        <p class="mb-1">Aplicación creada por {{ $autor }} como ejemplo de clase.</p>
+        <p class="mb-0">Desarrollada con <strong>Laravel</strong> y <strong>Bootstrap</strong>.</p>
     </footer>
 </body>
+
 </html>

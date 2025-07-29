@@ -18,23 +18,26 @@ class CreateComentariosTable extends Migration
 
             $table->string('titulo', 255);
             $table->string('tema', 255);
-            $table->text('texto'); // Ajustado para ser tipo text
+            $table->text('texto');
             $table->string('imagen', 255)->nullable();
             $table->integer('visitas');
 
             $table->unsignedBigInteger('user_id')->nullable();
-            // Marcas de tiempo: campos created_at y updated_at
+            $table->unsignedBigInteger('noticia_id'); // ← Añadido
+
             $table->timestamps();
-            // Marca de tiempo de borrado
             $table->softDeletes();
-            // Campo published_at
             $table->timestamp('published_at')->nullable();
-            // Campo rejected
             $table->boolean('rejected')->default(false);
-            // Relaciona los dos campos
+
+            // Claves foráneas
             $table->foreign('user_id')
                 ->references('id')->on('users')
                 ->onUpdate('cascade')->onDelete('restrict');
+
+            $table->foreign('noticia_id') // ← Añadido
+                ->references('id')->on('noticias')
+                ->onDelete('cascade'); // Eliminación en cascada
         });
     }
 
@@ -46,8 +49,10 @@ class CreateComentariosTable extends Migration
     public function down()
     {
         Schema::table('comentarios', function (Blueprint $table) {
-            $table->dropForeign('comentarios_user_id_foreign');
+            $table->dropForeign(['user_id']);
+            $table->dropForeign(['noticia_id']); // ← Añadido
         });
+
         Schema::dropIfExists('comentarios');
     }
 }

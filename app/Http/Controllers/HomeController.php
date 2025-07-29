@@ -21,8 +21,16 @@ class HomeController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
+    // app/Http/Controllers/HomeController.php
     public function index()
     {
-        return view('home');
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        $noticias = $user->noticias()
+            ->orderByDesc('id')
+            ->paginate(5);
+
+        return view('home', compact('noticias'));
     }
 }

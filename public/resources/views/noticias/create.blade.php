@@ -1,37 +1,87 @@
 @extends('layouts.master')
-@php($pagina='nuevanoticia')
-
-@section('titulo', 'Nueva Noticia')
+@php($pagina = 'nuevanoticia')
 
 @section('contenido')
-<form class="my-2 border p-5" method="POST" action="{{ route('noticias.store') }}" enctype="multipart/form-data">
-    {{ csrf_field() }}
-    <div class="form-group row">
-        <label for="inputTitulo" class="col-sm-2 col-form-label">Título</label>
-        <input name="titulo" type="text" class="up form-control col-sm-10" id="inputTitulo" placeholder="Título" maxlength="255" value="{{ old('titulo') }}">
-    </div>
-    <div class="form-group row">
-        <label for="inputTema" class="col-sm-2 col-form-label">Tema</label>
-        <input name="tema" type="text" class="up form-control col-sm-10" id="inputTema" placeholder="Tema" maxlength="255" value="{{ old('tema') }}">
-    </div>
-    <div class="form-group row">
-        <label for="inputTexto" class="col-sm-2 col-form-label">Texto</label>
-        <textarea name="texto" class="form-control col-sm-10" id="inputTexto" placeholder="Texto de la noticia" rows="5">{{ old('texto') }}</textarea>
-    </div>
-    <div class="form-group row">
-        <label for="inputImagen" class="col-sm-2 col-form-label">Imagen</label>
-        <input name="imagen" type="file" class="form-control col-sm-10" id="inputImagen" accept="image/*">
-    </div>
-    <div class="d-flex justify-content-center">
-        <div class="form-group row">
-            <button type="submit" class="btn btn-success m-2 mt-5">Guardar</button>
-            <button type="reset" class="btn btn-secondary m-2">Borrar</button>
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-warning text-dark fw-bold">
+            <i class="bi bi-plus-circle me-2"></i> Crear Nueva Noticia
+        </div>
+
+        <div class="card-body p-4">
+            <form method="POST" action="{{ route('noticias.store') }}" enctype="multipart/form-data">
+                @csrf
+
+                {{-- Título --}}
+                <div class="mb-3">
+                    <label for="inputTitulo" class="form-label">Título</label>
+                    <input name="titulo" type="text"
+                        class="form-control @error('titulo') is-invalid @enderror"
+                        id="inputTitulo" placeholder="Título"
+                        maxlength="255" value="{{ old('titulo') }}">
+                    @error('titulo')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Tema --}}
+                <div class="mb-3">
+                    <label for="inputTema" class="form-label">Tema</label>
+                    <select name="tema" id="inputTema"
+                        class="form-select @error('tema') is-invalid @enderror">
+                        <option value="">Selecciona un tema...</option>
+                        @foreach ($temas as $tema)
+                        <option value="{{ $tema }}" {{ old('tema') == $tema ? 'selected' : '' }}>
+                            {{ $tema }}
+                        </option>
+                        @endforeach
+                    </select>
+                    @error('tema')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Texto --}}
+                <div class="mb-3">
+                    <label for="inputTexto" class="form-label">Texto</label>
+                    <textarea name="texto"
+                        class="form-control @error('texto') is-invalid @enderror"
+                        id="inputTexto" placeholder="Texto de la noticia"
+                        rows="5">{{ old('texto') }}</textarea>
+                    @error('texto')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Imagen --}}
+                <div class="mb-4">
+                    <label for="inputImagen" class="form-label">Imagen</label>
+                    <input name="imagen" type="file"
+                        class="form-control @error('imagen') is-invalid @enderror"
+                        id="inputImagen" accept="image/*">
+                    @error('imagen')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                {{-- Botones --}}
+                <div class="d-flex justify-content-between">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Borrar
+                    </button>
+                    <button type="submit" class="btn btn-outline-orange">
+                        <i class="bi bi-check2-circle"></i> Guardar
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
-</form>
+</div>
 @endsection
 
 @section('enlaces')
 @parent
-<a href="{{ route('noticias.index') }}" class="btn btn-primary m-2">Listado de Noticias</a>
+<a href="{{ route('noticias.index') }}" class="btn btn-outline-orange m-2">
+    <i class="bi bi-card-list"></i> Noticias
+</a>
 @endsection
