@@ -9,11 +9,18 @@ class WelcomeController extends Controller
 {
     public function index()
     {
-        // Recuperar las últimas 4 noticias
-        $noticias = Noticia::latest()->take(3)->get();
-        $total = Noticia::count();
+        // Traer todas las noticias
+        $noticias = Noticia::latest()->get();
 
-        // Pasar las noticias y el total a la vista
-        return view('welcome', compact('noticias', 'total'));
+        // Carrusel con las 3 primeras
+        $destacadas = $noticias->take(3);
+
+        // 3 noticias más (de la 4 a la 6)
+        $resto = $noticias->skip(3)->take(3);
+
+        // Total de noticias
+        $total = $noticias->count();
+
+        return view('welcome', compact('destacadas', 'resto', 'total'));
     }
 }

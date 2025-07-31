@@ -131,3 +131,57 @@ h2 {
     background-color: #fff;
     border-color: #dee2e6;
 }
+
+/* Mejora el contraste del texto del carrusel en móviles */
+@media (max-width: 576px) {
+    .carousel-caption-box h3 {
+        font-size: 1.25rem;
+    }
+    .carousel-caption-box p {
+        display: none;
+    }
+}
+
+/* --- Estilos para comentarios tipo "thread" --- */
+.comment-thread {
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.comment-thread:hover {
+    background-color: #fefefe;
+    transform: translateY(-2px);
+}
+
+/* Botón eliminar pequeño en hover */
+.comment-thread form button {
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.comment-thread form button:hover {
+    opacity: 1;
+}
+
+/* Para que el icono de persona "bi-person-circle" no se vea pegado arriba */
+.bi-person-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 48px;
+}
+
+.comment-thread .comment-box {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.comment-thread .comment-box:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.comment-thread .author-comment {
+    background-color: #fff8e1; /* Amarillo suave */
+    border: 1px solid #ffe082;
+}

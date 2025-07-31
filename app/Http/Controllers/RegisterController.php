@@ -11,6 +11,7 @@ use App\Models\Role;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
@@ -32,12 +33,19 @@ class RegisterController extends Controller
             'population' => ['required', 'string', 'max:255'],
             'postal_code' => ['required', 'string', 'max:10'],
             'birthdate' => ['required', 'date'],
+            'imagen' => ['nullable', 'image', 'max:2048'], // <= Nueva validación
         ]);
     }
 
     protected function create(array $data)
     {
-        // Crear el nuevo usuario
+        // Subir imagen si existe
+        $imagenPath = null;
+        if (request()->hasFile('imagen')) {
+            $imagenPath = request()->file('imagen')->store('images/users', 'public');
+        }
+
+        // Crear usuario
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
@@ -45,17 +53,17 @@ class RegisterController extends Controller
             'population' => $data['population'],
             'postal_code' => $data['postal_code'],
             'birthdate' => $data['birthdate'],
+            'imagen' => $imagenPath ? basename($imagenPath) : null,
         ]);
 
-        // Obtener el rol 'user'
-        $role = Role::where('name', 'user')->first();
-
-        // Asignar el rol 'user' al usuario
+        // Asignar rol 'user'
+        $role = Role::where('role', 'user')->first(); // ojo: tu tabla tiene columna 'role'
         if ($role) {
             try {
                 $user->roles()->attach($role->id);
             } catch (QueryException $e) {
-                return back()->withErrors("No se pudo añadir el rol {$role->name} al usuario {$user->name}.");
+                // Opcional: loguear o manejar error
+                \Log::error("Error asignando rol a {$user->email}: " . $e->getMessage());
             }
         }
 

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Comentario;
+use App\Models\User;
 
 class ComentarioController extends Controller
 {
@@ -77,8 +79,17 @@ class ComentarioController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Comentario $comentario)
     {
-        //
+        $user = auth()->user();
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+        if ($user->id === $comentario->user_id || $user->hasRole('administrador')) {
+            $comentario->delete();
+
+            return back()->with('success', 'Comentario eliminado correctamente.');
+        }
+
+        abort(403, 'No autorizado para eliminar este comentario.');
     }
 }

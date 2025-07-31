@@ -1,49 +1,56 @@
 @extends('layouts.master')
 
+@section('titulo', 'Confirmar Contraseña')
+
 @section('contenido')
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">{{ __('Confirm Password') }}</div>
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-warning text-dark fw-bold">
+                <i class="bi bi-shield-lock me-2"></i> Confirmar Contraseña
+            </div>
 
-                <div class="card-body">
-                    {{ __('Please confirm your password before continuing.') }}
+            <div class="card-body">
+                <p class="mb-4 text-muted">
+                    Por favor confirma tu contraseña antes de continuar.
+                </p>
 
-                    <form method="POST" action="{{ route('password.confirm') }}">
-                        @csrf
+                <form method="POST" action="{{ route('password.confirm') }}">
+                    @csrf
 
-                        <div class="row mb-3">
-                            <label for="password" class="col-md-4 col-form-label text-md-end">{{ __('Password') }}</label>
+                    {{-- Password --}}
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Contraseña</label>
+                        <input id="password" type="password"
+                            class="form-control @error('password') is-invalid @enderror"
+                            name="password" required autocomplete="current-password"
+                            placeholder="Introduce tu contraseña">
 
-                            <div class="col-md-6">
-                                <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="current-password">
+                        @error('password')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
 
-                                @error('password')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
+                    {{-- Botones --}}
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button type="submit" class="btn btn-outline-orange">
+                            <i class="bi bi-check-circle"></i> Confirmar
+                        </button>
 
-                        <div class="row mb-0">
-                            <div class="col-md-8 offset-md-4">
-                                <button type="submit" class="btn btn-primary">
-                                    {{ __('Confirm Password') }}
-                                </button>
-
-                                @if (Route::has('password.request'))
-                                    <a class="btn btn-link" href="{{ route('password.request') }}">
-                                        {{ __('Forgot Your Password?') }}
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                        @if (Route::has('password.request'))
+                        <a class="btn btn-link text-muted" href="{{ route('password.request') }}">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                        @endif
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 </div>
+@endsection
+
+@section('enlaces')
+@parent
+<a href="{{ route('welcome') }}" class="btn btn-outline-orange m-2">Inicio</a>
 @endsection

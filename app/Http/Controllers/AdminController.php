@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use App\Models\Noticia;
 use App\Models\User;
@@ -10,109 +11,103 @@ use Illuminate\Database\QueryException;
 
 class AdminController extends Controller
 {
-    /**
-     * Summary of deletedBikes
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
     public function deletedNoticias()
     {
-        //recupera las motos
-        $noticias = Noticia::onlyTrashed()->paginate(config('pagination.noticias', 10));
+        // Lista solo las borradas (soft delete)
+        $noticias = Noticia::onlyTrashed()
+            ->orderByDesc('deleted_at')
+            ->paginate(config('pagination.noticias', 10));
 
-        //carga la vista
         return view('admin.noticias.deleted', ['noticias' => $noticias]);
     }
 
-    // muestra la lista de usuarios
     /**
-     * Summary of userList
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * Restaura una noticia desde la papelera.
      */
-    public function userList(){
+    public function restoreNoticia($id)
+    {
+        $noticia = Noticia::onlyTrashed()->findOrFail($id);
+        $noticia->restore();
+
+        return redirect()->route('admin.deleted.noticias')
+            ->with('success', "La noticia '{$noticia->titulo}' ha sido restaurada.");
+    }
+
+    /**
+     * Elimina definitivamente una noticia (borra el registro).
+     * OJO: esta acción no se puede deshacer.
+     */
+    public function forceDeleteNoticia($id)
+    {
+        $noticia = Noticia::onlyTrashed()->findOrFail($id);
+
+        if ($noticia->imagen && Storage::disk('public')->exists('images/noticias/' . $noticia->imagen)) {
+            Storage::disk('public')->delete('images/noticias/' . $noticia->imagen);
+        }
+
+        $noticia->forceDelete();
+
+        return redirect()->route('admin.deleted.noticias')
+            ->with('success', "La noticia '{$noticia->titulo}' ha sido eliminada definitivamente.");
+    }
+    // -----------------------------
+    // Gestión de usuarios (tal como ya la tienes)
+    // -----------------------------
+    public function userList()
+    {
         $users = User::orderBy('name', 'ASC')
             ->paginate(config('pagination.users', 10));
 
         return view('admin.users.list', ['users' => $users]);
     }
 
-    //muestra un usuario
-    /**
-     * Summary of userShow
-     * @param \App\Models\User $user
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    public function userShow(User $user){
-        //carga la ista de detalles y le pasa el usuario recuperado
-        return view('admin.users.show', ['user'=>$user]);
+    public function userShow(User $user)
+    {
+        return view('admin.users.show', ['user' => $user]);
     }
 
-    //método que busca usuarios
-    /**
-     * Summary of userSearch
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    public function userSearch(Request $request){
+    public function userSearch(Request $request)
+    {
         $request->validate(['name' => 'max:32', 'email' => 'max:32']);
 
-        //toma los valores que llegan para el nombre y email
-        $name = $request->input('name','');
-        $email = $request->input('email','');
+        $name = $request->input('name', '');
+        $email = $request->input('email', '');
 
-        //recupera los resultados, añadimos marca y modelo al paginator
-        //para que haga bien los enlaces y se mantenga el filtro al pasar de página
         $users = User::orderBy('name', 'ASC')
             ->where('name', 'like', "%$name%")
             ->where('email', 'like', "%$email%")
-            ->paginate(config('pagination.users'))
+            ->paginate(config('pagination.users', 10))
             ->appends(['name' => $name, 'email' => $email]);
-        
-        //retorna la vista de lista con el filtro aplicado
-        return view('admin.users.list', ['users'=>$users, 'name'=>$name, 'email'=>$email]);
+
+        return view('admin.users.list', ['users' => $users, 'name' => $name, 'email' => $email]);
     }
 
-    //añade un rol a un usuario
-    /**
-     * Summary of setRole
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function setRole(Request $request){
+    public function setRole(Request $request)
+    {
         $role = Role::find($request->input('role_id'));
         $user = User::find($request->input('user_id'));
 
-        //intenta añadir el rol
-        try{
-            $user->roles()->attach($role->id,[
+        try {
+            $user->roles()->attach($role->id, [
                 'created_at' => now(),
                 'updated_at' => now()
             ]);
-            return back()
-                ->with('success', "Rol $role->role añadido a $user->name correctamente.");
-            
-        // si no lo consigue... (use Illuminate\Database\QueryException)
-        }catch(QueryException $e){
-            return back()
-                ->withErrors("No se pudo añadir el rol $role->role a $user->name.
-                                Es posible que ya lo tenga.");
+            return back()->with('success', "Rol $role->role añadido a $user->name correctamente.");
+        } catch (QueryException $e) {
+            return back()->withErrors("No se pudo añadir el rol $role->role a $user->name. Es posible que ya lo tenga.");
         }
     }
 
-    //quita un rol a un usuario
-    public function removeRole(Request $request){
+    public function removeRole(Request $request)
+    {
         $role = Role::find($request->input('role_id'));
         $user = User::find($request->input('user_id'));
 
-        //intenta quitar el rol
-        try{
+        try {
             $user->roles()->detach($role->id);
-            return back()
-                ->with('success', "Rol $role->role quitado a $user->name correctamente.");
-
-        //si no lo consigue...
-        }catch(QueryException $e){
-            return back()
-                ->withErrors("No se pudo quitar el rol $role->role a $user->name.");
+            return back()->with('success', "Rol $role->role quitado a $user->name correctamente.");
+        } catch (QueryException $e) {
+            return back()->withErrors("No se pudo quitar el rol $role->role a $user->name.");
         }
     }
 }

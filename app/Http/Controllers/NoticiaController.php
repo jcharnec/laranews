@@ -2,10 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comentario;
+use App\Models\User;
 use App\Models\Noticia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
+
+
 
 class NoticiaController extends Controller
 {
@@ -97,20 +101,32 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Ver detalles (público).
+     * Summary of show
+     * @param mixed $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function show($id)
     {
-        $noticia = Noticia::findOrFail($id);
+        // Cargamos la noticia con su autor
+        $noticia = Noticia::with('user')->findOrFail($id);
 
-        // (Opcional) incrementar visitas:
-        // $noticia->increment('visitas');
+        // Paginamos los comentarios de esta noticia y cargamos el autor de cada comentario
+        $comentarios = $noticia->comentarios()
+            ->with('user')
+            ->latest()
+            ->paginate(5);
 
-        return view('noticias.show', compact('noticia'));
+        // Sumar visita
+        $noticia->increment('visitas');
+
+        // Pasamos la noticia y los comentarios a la vista
+        return view('noticias.show', compact('noticia', 'comentarios'));
     }
 
     /**
      * Formulario de edición (dueño o admin).
+     * @param mixed $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
@@ -206,10 +222,37 @@ class NoticiaController extends Controller
      */
     private function canManage(Noticia $noticia): bool
     {
+        /** @var User|null $user */
         $user = auth()->user();
-        if (!$user) return false;
+
+        if (!$user instanceof User) {
+            return false;
+        }
 
         // Dueño de la noticia o rol administrador
         return $user->id === $noticia->user_id || $user->hasRole('administrador');
+    }
+
+    /**
+     * Summary of storeComentario
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\Noticia $noticia
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function storeComentario(Request $request, Noticia $noticia)
+    {
+        $request->validate([
+            'texto' => 'required|string|min:3|max:2000',
+        ]);
+
+        $comentario = new Comentario([
+            'texto'      => $request->input('texto'),
+            'user_id'    => auth()->id(),
+            'noticia_id' => $noticia->id,
+        ]);
+
+        $comentario->save();
+
+        return back()->with('success', 'Comentario publicado.');
     }
 }

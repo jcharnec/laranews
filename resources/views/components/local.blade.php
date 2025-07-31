@@ -1,3 +1,3 @@
-<div class="alert alert-warning">
-    <b>Atención:</b> estas probando la aplicación en modo {{ $mode }}.
-</div>
+<x-alert type="warning" icon="exclamation-triangle-fill">
+    <b>Atención:</b> estás probando la aplicación en modo {{ $mode }}.
+</x-alert>

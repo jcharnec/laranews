@@ -4,11 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;   // ⬅️ importa el trait
 use Illuminate\Support\Str;
 
 class Noticia extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;                // ⬅️ actívalo aquí
 
     protected $fillable = [
         'titulo',
@@ -44,7 +45,7 @@ class Noticia extends Model
      */
     public function comentarios()
     {
-        return $this->hasMany(Comentario::class);
+        return $this->hasMany(Comentario::class)->latest();
     }
 
     /**

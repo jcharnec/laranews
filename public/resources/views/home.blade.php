@@ -1,5 +1,7 @@
 @extends('layouts.master')
 
+@section('titulo', 'Mi Panel de Usuario')
+
 @section('contenido')
 <div class="row justify-content-center mt-4">
     <div class="col-lg-8">

@@ -3,15 +3,18 @@
 @section('titulo', 'Listado de Noticias')
 
 @section('contenido')
+
+<p>Contamos con un total de <strong>{{ $total ?? 0 }}</strong> noticias en nuestro portal.</p>
+
 <form method="GET" class="row g-2 align-items-end mb-4" action="{{ route('noticias.search') }}">
     <div class="col-md-4">
-        <label for="titulo" class="form-label">Título</label>
+        <label for="titulo" class="form-label"></label>
         <input type="text" id="titulo" name="titulo" class="form-control"
             placeholder="Título" maxlength="255" value="{{ $titulo ?? '' }}">
     </div>
 
     <div class="col-md-4">
-        <label for="tema" class="form-label">Tema</label>
+        <label for="tema" class="form-label"></label>
         <input type="text" id="tema" name="tema" class="form-control"
             placeholder="Tema" maxlength="255" value="{{ $tema ?? '' }}">
     </div>

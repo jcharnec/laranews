@@ -1,6 +1,8 @@
 @extends('layouts.master')
 @php($pagina = 'nuevanoticia')
 
+@section('titulo', 'Crear Nueva Noticia')
+
 @section('contenido')
 <div class="container mt-4">
     <div class="card shadow-sm border-0">
