@@ -49,20 +49,22 @@ class Noticia extends Model
     }
 
     /**
-     * Accessor para obtener la URL de la imagen
+     * Obtiene la URL de la imagen de la noticia.
+     * Si no hay imagen, devuelve una por defecto.
+     * @return string
      */
-    public function getImageUrlAttribute()
+    public function getImageUrlAttribute(): string
     {
         if (!$this->imagen) {
             return asset('storage/images/noticias/default.jpg');
         }
-
-        // Si viene con carpeta incluida (casos antiguos)
-        if (Str::startsWith($this->imagen, ['images/', 'public/'])) {
-            return asset('storage/' . ltrim($this->imagen, 'public/'));
+        $path = $this->imagen;
+        if (\Illuminate\Support\Str::startsWith($path, 'public/')) {
+            $path = substr($path, strlen('public/'));
         }
-
-        // Si solo es el nombre del archivo
-        return asset('storage/images/noticias/' . $this->imagen);
+        if (\Illuminate\Support\Str::startsWith($path, 'images/')) {
+            return asset('storage/' . $path);
+        }
+        return asset('storage/images/noticias/' . $path);
     }
 }

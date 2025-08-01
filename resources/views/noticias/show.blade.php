@@ -23,10 +23,31 @@
                 <span class="badge {{ badgeClass($noticia->tema) }}">
                     {{ $noticia->tema }}
                 </span>
-                <small class="text-muted">
-                    Por <strong>{{ $noticia->user->name ?? 'Sin autor' }}</strong> ·
-                    {{ $noticia->created_at->format('d/m/Y') }}
-                </small>
+
+                <div class="d-flex align-items-center gap-2">
+                    @if($noticia->user)
+                    {{-- Avatar del autor: imagen si existe, icono si no --}}
+                    @if($noticia->user->avatar_url)
+                    <img src="{{ $noticia->user->avatar_url }}"
+                        alt="Avatar de {{ $noticia->user->name }}"
+                        class="rounded-circle"
+                        style="width:28px;height:28px;object-fit:cover;">
+                    @else
+                    <i class="bi bi-person-circle text-secondary"
+                        style="font-size:28px;line-height:1;"></i>
+                    @endif
+
+                    <small class="text-muted">
+                        Por <strong>{{ $noticia->user->name }}</strong> ·
+                        {{ $noticia->created_at->format('d/m/Y') }}
+                    </small>
+                    @else
+                    <small class="text-muted">
+                        Por <strong>Sin autor</strong> ·
+                        {{ $noticia->created_at->format('d/m/Y') }}
+                    </small>
+                    @endif
+                </div>
             </div>
 
             {{-- Texto --}}
@@ -65,12 +86,15 @@
             <form method="POST" action="{{ route('noticias.comentarios.store', $noticia) }}" class="mb-4">
                 @csrf
                 <div class="d-flex">
-                    {{-- Avatar usuario logueado --}}
+                    {{-- Avatar del usuario logueado --}}
                     @if(auth()->user()->avatar_url)
-                    <img src="{{ $user->avatar_url ?? asset('images/default-avatar.png') }}" alt="Avatar">
-                    class="rounded-circle me-3" style="width:48px;height:48px;object-fit:cover;">
+                    <img src="{{ auth()->user()->avatar_url }}"
+                        alt="Avatar de {{ auth()->user()->name }}"
+                        class="rounded-circle me-3"
+                        style="width:48px;height:48px;object-fit:cover;">
                     @else
-                    <i class="bi bi-person-circle text-secondary me-3" style="font-size:48px;"></i>
+                    <i class="bi bi-person-circle text-secondary me-3"
+                        style="font-size:48px;line-height:1;"></i>
                     @endif
 
                     <div class="flex-grow-1">
@@ -99,50 +123,49 @@
             @forelse($comentarios as $comentario)
             @php
             $u = $comentario->user;
-            $cAvatar = $u && $u->imagen
-            ? asset('storage/images/users/' . $u->imagen)
-            : null;
-            $isAuthor = $noticia->user_id === $comentario->user_id;
+            $esAutor = $u && $u->id === $noticia->user_id;
             @endphp
 
-            <div class="d-flex mb-3 comment-thread">
-                {{-- Avatar --}}
-                @if($cAvatar)
-                <img src="{{ $cAvatar }}" alt="Avatar de {{ $u->name ?? 'Usuario' }}"
-                    class="rounded-circle me-3 shadow-sm" style="width:48px;height:48px;object-fit:cover;">
+            <div class="d-flex mb-3 pb-3 border-bottom {{ $esAutor ? 'bg-warning bg-opacity-10 rounded px-2 py-2' : '' }}">
+                {{-- Avatar del autor del comentario --}}
+                @if($u?->avatar_url)
+                <img src="{{ $u->avatar_url }}"
+                    alt="Avatar de {{ $u->name ?? 'Usuario' }}"
+                    class="rounded-circle me-3"
+                    style="width:48px;height:48px;object-fit:cover;">
                 @else
-                <i class="bi bi-person-circle text-secondary me-3" style="font-size:48px;"></i>
+                <i class="bi bi-person-circle text-secondary me-3"
+                    style="font-size:48px;line-height:1;"></i>
                 @endif
 
-                {{-- Contenido --}}
                 <div class="flex-grow-1">
-                    <div class="comment-box p-3 rounded shadow-sm {{ $isAuthor ? 'author-comment' : 'bg-light' }}">
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <div>
-                                <strong>{{ $u->name ?? 'Usuario' }}</strong>
-                                @if($isAuthor)
-                                <span class="badge bg-warning text-dark ms-2">Autor</span>
-                                @endif
-                            </div>
-                            <small class="text-muted" title="{{ $comentario->created_at->format('d/m/Y H:i') }}">
-                                {{ $comentario->created_at->diffForHumans() }}
-                            </small>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>{{ $u->name ?? 'Usuario' }}</strong>
+                            @if($esAutor)
+                            <span class="badge bg-warning text-dark ms-2">Autor</span>
+                            @endif
                         </div>
-
-                        <p class="mb-2">{{ $comentario->texto }}</p>
-
-                        {{-- Botón eliminar --}}
-                        @if(auth()->check() && (auth()->id() === $comentario->user_id || auth()->user()->hasRole('administrador')))
-                        <form method="POST" action="{{ route('comentarios.destroy', $comentario->id) }}" class="d-inline">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-outline-danger mt-1"
-                                onclick="return confirm('¿Eliminar este comentario?')">
-                                <i class="bi bi-trash"></i> Eliminar
-                            </button>
-                        </form>
-                        @endif
+                        <small class="text-muted"
+                            title="{{ $comentario->created_at->format('d/m/Y H:i') }}">
+                            {{ $comentario->created_at->diffForHumans() }}
+                        </small>
                     </div>
+
+                    <p class="mb-2">{{ $comentario->texto }}</p>
+
+                    {{-- Eliminar comentario (autor o admin) --}}
+                    @if(auth()->check() && (auth()->id() === $comentario->user_id || auth()->user()->hasRole('administrador')))
+                    <form method="POST" action="{{ route('comentarios.destroy', $comentario->id) }}" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit"
+                            class="btn btn-sm btn-outline-danger"
+                            onclick="return confirm('¿Eliminar este comentario?')">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                    @endif
                 </div>
             </div>
             @empty

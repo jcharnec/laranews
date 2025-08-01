@@ -3,11 +3,10 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
-class contact extends Mailable
+class Contact extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -30,16 +29,38 @@ class contact extends Mailable
      */
     public function build()
     {
-        $email =    $this->from($this->mensaje->email)
-            ->subject('Mensaje recibido:' . $this->mensaje->asunto)
-            ->with('centro', 'CIFO Sabadell')
-            ->view('emails.contact');
+        $asunto = $this->mensaje->asunto ?? 'Contacto';
+        $nombre = $this->mensaje->nombre ?? null; // si lo tienes en el form
+        $emailUsuario = $this->mensaje->email ?? null;
 
-        if ($this->mensaje->fichero)
-            $email->attach($this->mensaje->fichero, [
-                'as' => 'adjunto_' . uniqid() . '.pdf',
-                'mime' => 'application/pdf',
+        $email = $this
+            ->from(config('mail.from.address'), config('mail.from.name'))
+            ->subject("Mensaje recibido: {$asunto}")
+            ->when($emailUsuario, fn($m) => $m->replyTo($emailUsuario, $nombre))
+            ->view('emails.contact', [
+                'mensaje' => $this->mensaje,
+                'centro'  => 'CIFO Sabadell',
             ]);
+
+        // Adjuntar si hay fichero (acepta path o UploadedFile)
+        if (!empty($this->mensaje->fichero)) {
+            $f = $this->mensaje->fichero;
+
+            // Si es instancia de UploadedFile
+            if ($f instanceof \Illuminate\Http\UploadedFile) {
+                $email->attach($f->getRealPath(), [
+                    'as'   => 'adjunto_' . uniqid() . '.' . $f->getClientOriginalExtension(),
+                    'mime' => $f->getMimeType(),
+                ]);
+            } else {
+                // Si es ruta en disco
+                $email->attach($f, [
+                    'as'   => 'adjunto_' . uniqid() . '.pdf',
+                    'mime' => 'application/pdf',
+                ]);
+            }
+        }
+
         return $email;
     }
 }

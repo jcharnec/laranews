@@ -11,6 +11,24 @@
             </div>
 
             <div class="card-body">
+                {{-- Alertas de validación y estado --}}
+                @if ($errors->any())
+                <x-alert type="danger" icon="exclamation-triangle" :dismissible="false">
+                    <strong>Se han producido errores:</strong>
+                    <ul class="mb-0 mt-2 ps-3">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-alert>
+                @endif
+
+                @if (session('status'))
+                <x-alert type="success" icon="check-circle">
+                    {{ session('status') }}
+                </x-alert>
+                @endif
+
                 <form method="POST" action="{{ route('register') }}" enctype="multipart/form-data">
                     @csrf
 
@@ -32,7 +50,7 @@
                         <input id="email" type="email"
                             class="form-control @error('email') is-invalid @enderror"
                             name="email" value="{{ old('email') }}" required
-                            placeholder="ejemplo@correo.com">
+                            placeholder="ejemplo@correo.com" autocomplete="email">
                         @error('email')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -44,7 +62,7 @@
                         <input id="population" type="text"
                             class="form-control @error('population') is-invalid @enderror"
                             name="population" value="{{ old('population') }}" required
-                            placeholder="Ciudad o localidad">
+                            placeholder="Ciudad o localidad" autocomplete="address-level2">
                         @error('population')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -56,7 +74,10 @@
                         <input id="postal_code" type="text"
                             class="form-control @error('postal_code') is-invalid @enderror"
                             name="postal_code" value="{{ old('postal_code') }}" required
-                            placeholder="00000">
+                            placeholder="00000"
+                            inputmode="numeric" pattern="\d{4,10}"
+                            title="Introduce entre 4 y 10 dígitos">
+                        <div class="form-text">Entre 4 y 10 dígitos.</div>
                         @error('postal_code')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -99,10 +120,17 @@
                         <label for="imagen" class="form-label">Foto de perfil (opcional)</label>
                         <input id="imagen" type="file"
                             class="form-control @error('imagen') is-invalid @enderror"
-                            name="imagen" accept="image/*">
+                            name="imagen" accept="image/png,image/jpeg,image/webp,image/gif">
+                        <div class="form-text">Formatos: JPG, PNG, WEBP o GIF. Tamaño máx. 2 MB.</div>
                         @error('imagen')
                         <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+
+                        {{-- Vista previa --}}
+                        <div class="mt-2" id="previewWrapper" style="display:none;">
+                            <img id="previewImg" alt="Vista previa" class="rounded border"
+                                style="max-width: 120px; height: auto;">
+                        </div>
                     </div>
 
                     {{-- Botón --}}
@@ -116,6 +144,38 @@
         </div>
     </div>
 </div>
+
+{{-- Script de previsualización (no requiere @stack) --}}
+<script>
+    (function() {
+        const input = document.getElementById('imagen');
+        const wrapper = document.getElementById('previewWrapper');
+        const img = document.getElementById('previewImg');
+
+        if (!input) return;
+
+        input.addEventListener('change', function(e) {
+            const file = e.target.files && e.target.files[0];
+            if (!file) {
+                wrapper.style.display = 'none';
+                return;
+            }
+
+            const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+            if (!allowed.includes(file.type)) {
+                wrapper.style.display = 'none';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                img.src = ev.target.result;
+                wrapper.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        });
+    })();
+</script>
 @endsection
 
 @section('enlaces')

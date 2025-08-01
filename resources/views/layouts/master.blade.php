@@ -47,7 +47,6 @@
                     <li class="nav-item"><a class="nav-link {{ $pagina == 'contacto' ? 'active' : '' }}" href="{{ route('contacto') }}">Contacto</a></li>
 
                     @auth
-                    <li class="nav-item"><a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Mis noticias</a></li>
                     <li class="nav-item"><a class="nav-link {{ $pagina == 'noticias.create' ? 'active' : '' }}" href="{{ route('noticias.create') }}">Nueva noticia</a></li>
 
                     @if (Auth::user()->hasRole('administrador'))
@@ -59,6 +58,9 @@
 
                 {{-- Right --}}
                 <ul class="navbar-nav ms-auto">
+                    @auth
+                    <li class="nav-item"><a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Home</a></li>
+                    @endauth
                     @guest
                     @if (Route::has('login'))
                     <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>

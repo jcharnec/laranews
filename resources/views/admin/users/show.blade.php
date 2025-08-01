@@ -39,7 +39,6 @@
                                     <th>Fecha de verificación</th>
                                     <td>
                                         @php
-                                        // En tu migración la columna es email_verified_at
                                         $verified = $user->email_verified_at ?? $user->verified_at ?? null;
                                         @endphp
                                         {{ $verified ? \Carbon\Carbon::parse($verified)->format('d/m/Y H:i') : 'Sin verificar' }}
@@ -51,7 +50,6 @@
                                         @forelse($user->roles as $rol)
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <span class="badge bg-secondary">{{ $rol->role }}</span>
-
                                             {{-- Quitar rol --}}
                                             <form method="POST" action="{{ route('admin.user.removeRole') }}" class="d-inline">
                                                 @csrf
@@ -96,15 +94,23 @@
 
                 {{-- Columna derecha: avatar --}}
                 <div class="col-lg-4">
-                    <div class="text-center">
+                    <div class="d-flex flex-column align-items-center">
+                        @if($user->imagen)
+                        {{-- Foto real del usuario (160x160, recortada y centrada) --}}
                         <img
-                            class="rounded img-fluid"
-                            style="max-width: 260px; object-fit: cover;"
-                            src="{{ $user->imagen
-                                    ? asset('storage/' . $user->imagen)
-                                    : asset('storage/images/users/default.png') }}"
-                            alt="Imagen de usuario {{ $user->name }}">
-                        <figcaption class="figure-caption text-center mt-2">{{ $user->name }}</figcaption>
+                            src="{{ asset('storage/images/users/' . $user->imagen) }}"
+                            alt="Avatar de {{ $user->name }}"
+                            class="rounded-circle img-thumbnail"
+                            style="width:160px;height:160px;object-fit:cover;">
+                        @else
+                        {{-- Avatar por defecto: mismo tamaño que la foto --}}
+                        <div class="rounded-circle bg-light border d-flex align-items-center justify-content-center"
+                            style="width:160px;height:160px;">
+                            <i class="bi bi-person" style="font-size:80px;"></i>
+                        </div>
+                        @endif
+
+                        <div class="text-muted mt-2">{{ $user->name }}</div>
                     </div>
                 </div>
             </div>

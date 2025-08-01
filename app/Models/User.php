@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @method bool hasRole(string|array $roleNames)
@@ -22,7 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'population',
         'postal_code',
         'birthdate',
-        // 'imagen', // añade si gestionas avatar en BD
+        'imagen', // añade si gestionas avatar en BD
     ];
 
     protected $hidden = ['password', 'remember_token'];
@@ -89,10 +90,14 @@ class User extends Authenticatable implements MustVerifyEmail
      *
      * @return string|null
      */
-    public function getAvatarUrlAttribute()
+    public function getAvatarUrlAttribute(): ?string
     {
-        return $this->imagen
-            ? asset('storage/images/users/' . $this->imagen)
-            : null;
+        if (!$this->imagen) return null;
+
+        $path = 'images/users/' . $this->imagen;
+        if (Storage::disk('public')->exists($path)) {
+            return asset('storage/' . $path);
+        }
+        return null;
     }
 }

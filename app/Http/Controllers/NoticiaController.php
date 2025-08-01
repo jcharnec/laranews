@@ -8,14 +8,10 @@ use App\Models\Noticia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
-
-
+use Illuminate\Support\Str;
 
 class NoticiaController extends Controller
 {
-    /**
-     * Aplica middlewares.
-     */
     public function __construct()
     {
         // Requiere email verificado para todo excepto listar/ver/buscar
@@ -30,8 +26,11 @@ class NoticiaController extends Controller
      */
     public function index(Request $request)
     {
-        $noticias = Noticia::orderByDesc('id')->paginate(9);
-        $total    = Noticia::count();
+        $noticias = Noticia::with('user')
+            ->orderByDesc('id')
+            ->paginate(9);
+
+        $total = Noticia::count();
 
         return View::make('noticias.list', [
             'noticias' => $noticias,
@@ -47,7 +46,8 @@ class NoticiaController extends Controller
         $titulo = $titulo ?? $request->input('titulo', '');
         $tema   = $tema   ?? $request->input('tema', '');
 
-        $noticias = Noticia::when($titulo !== '', fn($q) => $q->where('titulo', 'LIKE', "%{$titulo}%"))
+        $noticias = Noticia::with('user')
+            ->when($titulo !== '', fn($q) => $q->where('titulo', 'LIKE', "%{$titulo}%"))
             ->when($tema !== '', fn($q) => $q->where('tema', 'LIKE', "%{$tema}%"))
             ->orderByDesc('id')
             ->paginate(8)
@@ -86,31 +86,32 @@ class NoticiaController extends Controller
         $noticia->visitas      = 0;
         $noticia->published_at = null;
         $noticia->rejected     = false;
-        $noticia->user_id      = auth()->id(); // 👈 dueño
+        $noticia->user_id      = auth()->id();
 
         if ($request->hasFile('imagen')) {
-            // guarda en storage/app/public/images/noticias
-            $path = $request->file('imagen')->store('images/noticias', 'public');
-            // guardamos la ruta relativa (p.ej. images/noticias/archivo.jpg)
-            $noticia->imagen = $path;
+            $file = $request->file('imagen');
+            $filename = Str::uuid() . '.' . $file->extension();
+            // Guarda en storage/app/public/images/noticias
+            $file->storeAs('images/noticias', $filename, 'public');
+            // En BD guardamos SOLO el nombre (convención)
+            $noticia->imagen = $filename;
         }
 
         $noticia->save();
 
-        return redirect()->route('noticias.index')->with('success', 'Noticia creada exitosamente.');
+        return redirect()
+            ->route('noticias.index')
+            ->with('success', 'Noticia creada exitosamente.');
     }
 
     /**
-     * Summary of show
-     * @param mixed $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * Mostrar detalle + comentarios paginados (público).
      */
     public function show($id)
     {
-        // Cargamos la noticia con su autor
         $noticia = Noticia::with('user')->findOrFail($id);
 
-        // Paginamos los comentarios de esta noticia y cargamos el autor de cada comentario
+        // Paginamos los comentarios (con su autor)
         $comentarios = $noticia->comentarios()
             ->with('user')
             ->latest()
@@ -119,14 +120,11 @@ class NoticiaController extends Controller
         // Sumar visita
         $noticia->increment('visitas');
 
-        // Pasamos la noticia y los comentarios a la vista
         return view('noticias.show', compact('noticia', 'comentarios'));
     }
 
     /**
      * Formulario de edición (dueño o admin).
-     * @param mixed $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit($id)
     {
@@ -136,7 +134,6 @@ class NoticiaController extends Controller
             abort(403, 'No tienes permisos para editar esta noticia.');
         }
 
-        // Si quieres reutilizar el selector de temas:
         $temas = ['Actualidad', 'Política', 'Deportes', 'Cultura', 'Tecnología', 'Economía', 'Opinión'];
 
         return view('noticias.edit', compact('noticia', 'temas'));
@@ -165,13 +162,20 @@ class NoticiaController extends Controller
         $noticia->texto  = $request->texto;
 
         if ($request->hasFile('imagen')) {
-            // Si hay imagen previa, la borramos (si no es null)
+            // Borrar la previa (sea nombre suelto o ruta vieja con 'images/noticias/...'):
             if ($noticia->imagen) {
-                Storage::disk('public')->delete($noticia->imagen);
+                $old = $this->noticiaImageDiskPath($noticia->imagen); // relativo al disco 'public'
+                if ($old && Storage::disk('public')->exists($old)) {
+                    Storage::disk('public')->delete($old);
+                }
             }
 
-            $path = $request->file('imagen')->store('images/noticias', 'public');
-            $noticia->imagen = $path; // ruta relativa
+            $file = $request->file('imagen');
+            $filename = Str::uuid() . '.' . $file->extension();
+            $file->storeAs('images/noticias', $filename, 'public');
+
+            // Guardamos solo el nombre
+            $noticia->imagen = $filename;
         }
 
         $noticia->save();
@@ -196,7 +200,7 @@ class NoticiaController extends Controller
     }
 
     /**
-     * Borrar noticia (dueño o admin).
+     * Borrar noticia (soft delete) y su imagen en disco.
      */
     public function destroy($id)
     {
@@ -206,38 +210,22 @@ class NoticiaController extends Controller
             abort(403, 'No tienes permisos para eliminar esta noticia.');
         }
 
-        // Borra imagen asociada si existe
         if ($noticia->imagen) {
-            Storage::disk('public')->delete($noticia->imagen);
+            $path = $this->noticiaImageDiskPath($noticia->imagen);
+            if ($path && Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
         }
 
         $noticia->delete();
 
-        return redirect()->route('noticias.index')
+        return redirect()
+            ->route('noticias.index')
             ->with('success', 'La noticia ha sido eliminada');
     }
 
     /**
-     * Helper de autorización: dueño o admin.
-     */
-    private function canManage(Noticia $noticia): bool
-    {
-        /** @var User|null $user */
-        $user = auth()->user();
-
-        if (!$user instanceof User) {
-            return false;
-        }
-
-        // Dueño de la noticia o rol administrador
-        return $user->id === $noticia->user_id || $user->hasRole('administrador');
-    }
-
-    /**
-     * Summary of storeComentario
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Noticia $noticia
-     * @return \Illuminate\Http\RedirectResponse
+     * Publicar comentario (requiere login verificado).
      */
     public function storeComentario(Request $request, Noticia $noticia)
     {
@@ -254,5 +242,33 @@ class NoticiaController extends Controller
         $comentario->save();
 
         return back()->with('success', 'Comentario publicado.');
+    }
+
+    /**
+     * Helper de autorización: dueño o admin.
+     */
+    private function canManage(Noticia $noticia): bool
+    {
+        /** @var User|null $user */
+        $user = auth()->user();
+
+        if (!$user instanceof User) {
+            return false;
+        }
+
+        return $user->id === $noticia->user_id || $user->hasRole('administrador');
+    }
+
+    /**
+     * Normaliza la ruta de la imagen de noticia relativa al disco 'public'.
+     * Acepta tanto nombres sueltos ("archivo.jpg") como rutas antiguas ("images/noticias/archivo.jpg").
+     */
+    private function noticiaImageDiskPath(?string $imagen): ?string
+    {
+        if (!$imagen) return null;
+
+        return Str::startsWith($imagen, 'images/')
+            ? $imagen
+            : 'images/noticias/' . $imagen;
     }
 }

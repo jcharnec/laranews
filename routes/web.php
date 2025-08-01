@@ -1,26 +1,35 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\NoticiaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Controllers\HomeController;
+
+// Controladores de tu app
 use App\Http\Controllers\WelcomeController;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ContactoController;
+use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ComentarioController;
+
+// Controlador de registro (forzamos el de Auth)
+use App\Http\Controllers\Auth\RegisterController as AuthRegister;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
 | Aquí se registran todas las rutas de la aplicación.
 |
+| Nota: desactivamos las rutas /register del scaffold y las declaramos abajo
+| apuntando explícitamente a Auth\RegisterController para garantizar que se
+| ejecute tu método register() que guarda el avatar.
 */
 
-// Grupo de rutas solo para el administrador (prefijo /admin)
-Route::prefix('admin')->middleware('auth', 'is_admin')->group(function () {
+// ===============================
+// Zona admin (prefijo /admin)
+// ===============================
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
 
     // Noticias eliminadas (papelera)
     Route::get('deletedNoticias', [AdminController::class, 'deletedNoticias'])
@@ -55,9 +64,19 @@ Route::prefix('admin')->middleware('auth', 'is_admin')->group(function () {
         ->name('admin.user.removeRole');
 });
 
+// ===============================
+// Auth + verificación email
+// ===============================
 
-// Autenticación y verificación de email
-Auth::routes(['verify' => true]);
+// Desactivamos las rutas de /register del scaffold
+Auth::routes([
+    'verify'   => true,
+    'register' => false,
+]);
+
+// Declaramos explícitamente las rutas de registro usando Auth\RegisterController
+Route::get('register',  [AuthRegister::class, 'showRegistrationForm'])->name('register');
+Route::post('register', [AuthRegister::class, 'register']);
 
 // Reenviar verificación de email
 Route::post('/email/verification-notification', function (Request $request) {
@@ -65,36 +84,45 @@ Route::post('/email/verification-notification', function (Request $request) {
     return back()->with('message', 'Verification link sent!');
 })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
-
+// ===============================
 // Portada
+// ===============================
 Route::get('/', [WelcomeController::class, 'index'])->name('welcome');
 
-// Rutas de contacto
+// ===============================
+// Contacto
+// ===============================
 Route::get('/contacto', [ContactoController::class, 'index'])->name('contacto');
 Route::post('/contacto', [ContactoController::class, 'send'])->name('contacto.email');
 
-
+// ===============================
 // CRUD de noticias
+// ===============================
 Route::get('/noticias/create', [NoticiaController::class, 'create'])->name('noticias.create'); // Nueva noticia
-Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store'); // Guardar noticia
-Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index'); // Listado
+Route::post('/noticias', [NoticiaController::class, 'store'])->name('noticias.store');         // Guardar noticia
+Route::get('/noticias', [NoticiaController::class, 'index'])->name('noticias.index');          // Listado
 Route::get('/noticias/search/{titulo?}/{tema?}', [NoticiaController::class, 'search'])->name('noticias.search'); // Búsqueda
-Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show'); // Detalles
-Route::get('/noticias/{noticia}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit'); // Editar
-Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update'); // Actualizar
-Route::get('/noticias/{noticia}/delete', [NoticiaController::class, 'delete'])->name('noticias.delete'); // Confirmar borrado
-Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy'); // Borrar
+Route::get('/noticias/{noticia}', [NoticiaController::class, 'show'])->name('noticias.show');  // Detalles
+Route::get('/noticias/{noticia}/edit', [NoticiaController::class, 'edit'])->name('noticias.edit');               // Editar
+Route::put('/noticias/{noticia}', [NoticiaController::class, 'update'])->name('noticias.update');                // Actualizar
+Route::get('/noticias/{noticia}/delete', [NoticiaController::class, 'delete'])->name('noticias.delete');         // Confirmar borrado
+Route::delete('/noticias/{noticia}', [NoticiaController::class, 'destroy'])->name('noticias.destroy');           // Borrar
 
 // Guardar comentario en una noticia (solo usuarios autenticados)
-Route::post('/noticias/{noticia}/comentarios', [\App\Http\Controllers\NoticiaController::class, 'storeComentario'])
+Route::post('/noticias/{noticia}/comentarios', [NoticiaController::class, 'storeComentario'])
     ->middleware('auth')
     ->name('noticias.comentarios.store');
-Route::delete('/comentarios/{comentario}', [ComentarioController::class, 'destroy'])
-    ->name('comentarios.destroy')
-    ->middleware('auth');
 
+Route::delete('/comentarios/{comentario}', [ComentarioController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('comentarios.destroy');
+
+// ===============================
 // Home (panel de usuario)
+// ===============================
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-// Ruta de fallback (si no coincide ninguna)
+// ===============================
+// Fallback
+// ===============================
 Route::fallback([WelcomeController::class, 'index']);
