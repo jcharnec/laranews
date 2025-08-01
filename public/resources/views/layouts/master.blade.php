@@ -59,7 +59,11 @@
                 {{-- Right --}}
                 <ul class="navbar-nav ms-auto">
                     @auth
-                    <li class="nav-item"><a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}">Home</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}" aria-label="Mi panel">
+                            <i class="bi bi-house-door"></i>
+                        </a>
+                    </li>
                     @endauth
                     @guest
                     @if (Route::has('login'))

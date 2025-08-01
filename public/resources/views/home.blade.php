@@ -27,14 +27,19 @@
                 </p>
 
                 {{-- Botones de acción --}}
-                <div class="d-flex flex-wrap mt-4 mb-4">
-                    <a href="{{ route('noticias.index') }}" class="btn btn-outline-orange me-2 mb-2">
-                        <i class="bi bi-card-list me-1"></i> Ver Todas las Noticias
+                <div class="d-flex flex-wrap gap-2 mt-4 mb-4">
+                    <a href="{{ route('noticias.index') }}" class="btn btn-sm btn-outline-orange d-flex align-items-center">
+                        <i class="bi bi-card-list me-1"></i> Ver Noticias
                     </a>
-                    <a href="{{ route('noticias.create') }}" class="btn btn-success mb-2">
+                    <a href="{{ route('noticias.create') }}" class="btn btn-sm btn-outline-success d-flex align-items-center">
                         <i class="bi bi-plus-circle me-1"></i> Nueva Noticia
                     </a>
+                    <a href="{{ route('perfil.edit') }}" class="btn btn-sm btn-outline-primary d-flex align-items-center">
+                        <i class="bi bi-person me-1"></i> Editar Perfil
+                    </a>
                 </div>
+
+
 
                 {{-- Listado de noticias del usuario --}}
                 @if(isset($noticias) && $noticias->count())

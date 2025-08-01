@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactoController;
 use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ComentarioController;
+use App\Http\Controllers\PerfilController;
 
 // Controlador de registro (forzamos el de Auth)
 use App\Http\Controllers\Auth\RegisterController as AuthRegister;
@@ -120,7 +121,15 @@ Route::delete('/comentarios/{comentario}', [ComentarioController::class, 'destro
 // ===============================
 // Home (panel de usuario)
 // ===============================
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('home');
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/perfil/editar', [PerfilController::class, 'edit'])->name('perfil.edit');
+    Route::put('/perfil/editar', [PerfilController::class, 'update'])->name('perfil.update');
+});
+
 
 // ===============================
 // Fallback

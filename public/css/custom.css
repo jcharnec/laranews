@@ -164,7 +164,17 @@ h2 {
 }
 
 /* Para que el icono de persona "bi-person-circle" no se vea pegado arriba */
-.bi-person-circle {
+/* ⚠️ Reemplaza esto: */
+/*.bi-person-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 48px;
+}*/
+
+/* ✅ Por esto (solo en perfil de usuario, por ejemplo): */
+.avatar-icon .bi-person-circle {
     display: flex;
     align-items: center;
     justify-content: center;
