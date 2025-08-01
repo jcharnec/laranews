@@ -5,11 +5,30 @@
 @section('contenido')
 <div class="container mt-4">
     <div class="card shadow-sm border-0">
-        <div class="card-header bg-warning text-dark fw-bold">
-            <i class="bi bi-people me-2"></i> Gestión de Usuarios
+        <div class="card-header bg-warning text-dark fw-bold d-flex justify-content-between align-items-center">
+            <div>
+                <i class="bi bi-people me-2"></i> Gestión de Usuarios
+            </div>
+            <a href="{{ route('admin.deleted.users') }}" class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-trash3"></i>
+                Papelera
+                @if($deletedCount > 0)
+                ({{ $deletedCount }})
+                @endif
+            </a>
         </div>
 
         <div class="card-body">
+
+            {{-- Alertas globales --}}
+            @if (session('success'))
+            <x-alert type="success" icon="check-circle" :message="session('success')" dismissible />
+            @endif
+
+            @if (session('error'))
+            <x-alert type="danger" icon="exclamation-triangle" :message="session('error')" dismissible />
+            @endif
+
             {{-- Formulario de búsqueda --}}
             <form method="GET" action="{{ route('admin.users.search') }}" class="row g-2 align-items-end mb-3">
                 <div class="col-md-4">

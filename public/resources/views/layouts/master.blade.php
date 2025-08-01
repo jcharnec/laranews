@@ -60,10 +60,16 @@
                 <ul class="navbar-nav ms-auto">
                     @auth
                     <li class="nav-item">
-                        <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}" href="{{ route('home') }}" aria-label="Mi panel">
+                        <a class="nav-link {{ $pagina == 'home' ? 'active' : '' }}"
+                            href="{{ route('home') }}"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom"
+                            title="Mi Panel de Usuario"
+                            aria-label="Mi Panel">
                             <i class="bi bi-house-door"></i>
                         </a>
                     </li>
+
                     @endauth
                     @guest
                     @if (Route::has('login'))
@@ -149,8 +155,16 @@
     </footer>
     @show
 
-    <!-- Bootstrap JS (mejor al final) -->
+    <!-- Bootstrap JS (mejor al final) y Activar tooltips Bootstrap -->
     <script src="{{ asset('js/bootstrap.bundle.js') }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            })
+        });
+    </script>
     @stack('scripts')
 </body>
 

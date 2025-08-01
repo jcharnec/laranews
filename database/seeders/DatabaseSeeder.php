@@ -2,25 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
     /**
      * Seed the application's database.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
+        // 1. Crear roles
         $this->call([
-            NoticiaSeeder::class,
             RoleSeeder::class,
         ]);
 
-        // Crear usuario administrador fijo
+        // 2. Crear usuario administrador fijo
         $admin = User::create([
             'name' => 'Administrador',
             'email' => 'admin@example.com',
@@ -28,16 +27,28 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Asignar el rol de administrador si existe
-        $adminRole = \App\Models\Role::where('role', 'administrador')->first();
+        // 3. Asignar el rol de administrador si existe
+        $adminRole = Role::where('role', 'administrador')->first();
         if ($adminRole) {
             $admin->roles()->attach($adminRole->id);
         }
 
+        // 4. Crear 50 usuarios más
         User::factory(50)->create();
 
+        // 5. Asignar roles a los usuarios
         $this->call([
             RoleUserSeeder::class,
+        ]);
+
+        // 6. Crear noticias (después de tener usuarios)
+        $this->call([
+            NoticiaSeeder::class,
+        ]);
+
+        // 7. Crear comentarios aleatorios (necesita noticias y usuarios)
+        $this->call([
+            ComentarioSeeder::class,
         ]);
     }
 }

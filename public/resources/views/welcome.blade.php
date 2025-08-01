@@ -6,19 +6,9 @@
 
 @section('contenido')
 
-<p>Contamos con un total de <strong>{{ $total ?? 0 }}</strong> noticias en nuestro portal.</p>
-
-<style>
-    .carousel-item img {
-        height: 400px;
-        object-fit: cover;
-    }
-
-    .card-img-top {
-        height: 220px;
-        object-fit: cover;
-    }
-</style>
+<p class="text-muted">
+    Contamos con un total de <strong class="text-dark">{{ $total ?? 0 }}</strong> noticias en nuestro portal.
+</p>
 
 <div class="container my-4">
     {{-- Carrusel de destacadas --}}
@@ -48,11 +38,11 @@
                             : asset('storage/images/noticias/default.jpg') }}"
                     class="d-block w-100"
                     alt="Imagen de {{ $noticia->titulo }}">
-                <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded p-2">
-                    <h5>{{ $noticia->titulo }}</h5>
-                    <p>{{ Str::limit($noticia->texto, 120, '...') }}</p>
-                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-outline-light btn-sm">
-                        Ver más
+                <div class="carousel-caption d-none d-md-block p-4">
+                    <h5 class="fw-semibold text-white text-shadow">{{ $noticia->titulo }}</h5>
+                    <p class="text-light text-shadow">{{ Str::limit($noticia->texto, 120, '...') }}</p>
+                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-orange btn-sm mt-2">
+                        <i class="bi bi-eye"></i> Ver más
                     </a>
                 </div>
             </div>
@@ -94,8 +84,8 @@
                     <small class="text-muted mt-2">
                         Por {{ $noticia->user->name ?? 'Anónimo' }} · {{ $noticia->created_at->format('d/m/Y') }}
                     </small>
-                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-outline-orange mt-auto">
-                        Ver detalles
+                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-outline-orange mt-auto d-grid">
+                        <i class="bi bi-eye"></i> Ver detalles
                     </a>
                 </div>
             </div>

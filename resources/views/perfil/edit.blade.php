@@ -99,6 +99,29 @@
                 </form>
             </div>
         </div>
+
+        {{-- Eliminar cuenta --}}
+        <div class="card border-danger mt-5">
+            <div class="card-header bg-danger text-white fw-bold d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i> Eliminar Cuenta
+            </div>
+
+            <div class="card-body">
+                <p class="text-danger mb-3">
+                    Esta acción eliminará tu cuenta de forma <strong>permanente</strong>. No podrás recuperarla después.
+                </p>
+
+                <form method="POST" action="{{ route('user.destroy') }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible.');">
+                    @csrf
+                    @method('DELETE')
+
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill me-1"></i> Confirmar eliminación
+                    </button>
+                </form>
+            </div>
+        </div>
+
     </div>
 </div>
 @endsection

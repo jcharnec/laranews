@@ -4,12 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;   // ⬅️ importa el trait
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Noticia extends Model
 {
-    use HasFactory, SoftDeletes;                // ⬅️ actívalo aquí
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'titulo',
@@ -18,7 +17,7 @@ class Noticia extends Model
         'imagen',
         'visitas',
         'user_id',
-        'rejected'
+        'rejected',
     ];
 
     /**
@@ -33,15 +32,18 @@ class Noticia extends Model
     }
 
     /**
-     * Relación con usuario
+     * Relación con el usuario autor
+     * Si el user_id es null, devuelve "Anónimo"
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)->withDefault([
+            'name' => 'Anónimo',
+        ]);
     }
 
     /**
-     * Relación con comentarios
+     * Relación con los comentarios
      */
     public function comentarios()
     {
@@ -49,22 +51,24 @@ class Noticia extends Model
     }
 
     /**
-     * Obtiene la URL de la imagen de la noticia.
-     * Si no hay imagen, devuelve una por defecto.
-     * @return string
+     * Devuelve la URL de la imagen de la noticia (o una por defecto)
      */
     public function getImageUrlAttribute(): string
     {
         if (!$this->imagen) {
             return asset('storage/images/noticias/default.jpg');
         }
+
         $path = $this->imagen;
-        if (\Illuminate\Support\Str::startsWith($path, 'public/')) {
+
+        if (str_starts_with($path, 'public/')) {
             $path = substr($path, strlen('public/'));
         }
-        if (\Illuminate\Support\Str::startsWith($path, 'images/')) {
+
+        if (str_starts_with($path, 'images/')) {
             return asset('storage/' . $path);
         }
+
         return asset('storage/images/noticias/' . $path);
     }
 }

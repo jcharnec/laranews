@@ -12,6 +12,8 @@ use App\Http\Controllers\NoticiaController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\PerfilController;
+use App\Http\Controllers\UserController;
+
 
 // Controlador de registro (forzamos el de Auth)
 use App\Http\Controllers\Auth\RegisterController as AuthRegister;
@@ -63,6 +65,14 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     // Quitar un rol a un usuario
     Route::delete('role', [AdminController::class, 'removeRole'])
         ->name('admin.user.removeRole');
+
+    // Eliminar un usuario
+    Route::delete('/admin/users/{user}', [AdminController::class, 'userDestroy'])->name('admin.user.destroy');
+
+    // Papelera de usuarios
+    Route::get('/admin/users/deleted', [AdminController::class, 'deletedUsers'])->name('admin.deleted.users');
+    Route::post('/admin/users/{id}/restore', [AdminController::class, 'restoreUser'])->name('admin.user.restore');
+    Route::delete('/admin/users/{id}/force-delete', [AdminController::class, 'forceDeleteUser'])->name('admin.user.forceDelete');
 });
 
 // ===============================
@@ -129,6 +139,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/perfil/editar', [PerfilController::class, 'edit'])->name('perfil.edit');
     Route::put('/perfil/editar', [PerfilController::class, 'update'])->name('perfil.update');
 });
+Route::delete('/perfil', [UserController::class, 'destroy'])->name('user.destroy')->middleware(['auth', 'verified']);
 
 
 // ===============================

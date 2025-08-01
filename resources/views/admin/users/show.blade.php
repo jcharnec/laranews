@@ -87,6 +87,19 @@
                                         </form>
                                     </td>
                                 </tr>
+                                <tr>
+                                    <th>Eliminar usuario</th>
+                                    <td>
+                                        <form method="POST" action="{{ route('admin.user.destroy', $user->id) }}" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario? Esta acción no se puede deshacer.')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                <i class="bi bi-trash me-1"></i> Eliminar usuario
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>

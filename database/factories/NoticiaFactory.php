@@ -3,36 +3,34 @@
 namespace Database\Factories;
 
 use App\Models\Noticia;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 class NoticiaFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = Noticia::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
+        $temasValidos = [
+            'Actualidad',
+            'Política',
+            'Deportes',
+            'Cultura',
+            'Tecnología',
+            'Economía',
+            'Opinión'
+        ];
+
         return [
             'titulo' => $this->faker->sentence,
-            'tema' => $this->faker->word,
+            'tema' => $this->faker->randomElement($temasValidos),
             'texto' => $this->faker->paragraphs(3, true),
-            'imagen' => null, // Sin imagen por defecto
-            'visitas' => 0, // Inicializa visitas a 0
-            'user_id' => \App\Models\User::factory(),
+            'imagen' => null, // Puedes usar 'default.jpg' si quieres una imagen por defecto
+            'visitas' => 0,
+            'user_id' => User::inRandomOrder()->first()?->id,
             'published_at' => $this->faker->optional()->dateTimeThisYear,
-            'rejected' => false, // Inicializa rejected a false
-            'created_at' => now(),
-            'updated_at' => now(),
+            'rejected' => false,
         ];
     }
 }
