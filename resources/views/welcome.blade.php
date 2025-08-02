@@ -13,7 +13,7 @@
 <div class="container my-4">
     {{-- Carrusel de destacadas --}}
     @if($destacadas->count() > 0)
-    <div id="destacadasCarousel" class="carousel slide mb-5 shadow-sm rounded overflow-hidden" data-bs-ride="carousel">
+    <div id="destacadasCarousel" class="carousel slide mb-5 shadow-sm rounded-4 overflow-hidden" data-bs-ride="carousel">
 
         {{-- Indicadores --}}
         @if($destacadas->count() > 1)
@@ -38,7 +38,7 @@
                             : asset('storage/images/noticias/default.jpg') }}"
                     class="d-block w-100"
                     alt="Imagen de {{ $noticia->titulo }}">
-                <div class="carousel-caption d-none d-md-block p-4">
+                <div class="carousel-caption d-none d-md-block p-4" style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); border-radius: 1rem;">
                     <h5 class="fw-semibold text-white text-shadow">{{ $noticia->titulo }}</h5>
                     <p class="text-light text-shadow">{{ Str::limit($noticia->texto, 120, '...') }}</p>
                     <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-orange btn-sm mt-2">
@@ -68,7 +68,7 @@
     <div class="row g-4">
         @foreach($resto as $noticia)
         <div class="col-md-4 d-flex">
-            <div class="card shadow-sm flex-fill h-100">
+            <div class="card shadow-sm flex-fill h-100 rounded-4 border-0 hover-zoom">
                 <img class="card-img-top"
                     src="{{ $noticia->imagen
                             ? asset('storage/images/noticias/' . $noticia->imagen)
@@ -84,7 +84,7 @@
                     <small class="text-muted mt-2">
                         Por {{ $noticia->user->name ?? 'Anónimo' }} · {{ $noticia->created_at->format('d/m/Y') }}
                     </small>
-                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-outline-orange mt-auto d-grid">
+                    <a href="{{ route('noticias.show', $noticia->id) }}" class="btn btn-orange text-white mt-auto d-grid">
                         <i class="bi bi-eye"></i> Ver detalles
                     </a>
                 </div>

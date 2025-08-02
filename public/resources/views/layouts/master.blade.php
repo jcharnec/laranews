@@ -24,6 +24,7 @@
 </head>
 
 <body class="d-flex flex-column min-vh-100">
+
     {{-- NAVBAR --}}
     @section('navegacion')
     @php($pagina = Route::currentRouteName())
@@ -69,8 +70,8 @@
                             <i class="bi bi-house-door"></i>
                         </a>
                     </li>
-
                     @endauth
+
                     @guest
                     @if (Route::has('login'))
                     <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a></li>
@@ -138,24 +139,31 @@
     {{-- FOOTER --}}
     @section('pie')
     <footer class="custom-footer mt-auto">
-        <div class="container d-flex flex-column flex-md-row justify-content-between align-items-center">
-            <div class="mb-2 mb-md-0">
+        <div class="container text-center">
+            <div class="mb-2">
                 Aplicación creada por <strong>{{ $autor }}</strong> como ejemplo de Laravel.<br>
                 Desarrollado con <i class="bi bi-laravel"></i> Laravel y <i class="bi bi-bootstrap"></i> Bootstrap.
             </div>
             <div>
-                <a href="https://github.com/jcharnec" target="_blank" class="text-white me-3" aria-label="GitHub">
+                <a href="https://github.com/jcharnec" target="_blank" class="social-link text-white me-3" aria-label="GitHub">
                     <i class="bi bi-github" style="font-size: 1.5rem;"></i>
                 </a>
-                <a href="https://www.linkedin.com/in/hotadev/" target="_blank" class="text-white" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/hotadev/" target="_blank" class="social-link" aria-label="LinkedIn">
                     <i class="bi bi-linkedin" style="font-size: 1.5rem;"></i>
                 </a>
             </div>
+
         </div>
     </footer>
+
+    {{-- Botón modo oscuro --}}
+    <button id="darkModeToggle" title="Modo oscuro">
+        <i class="bi bi-moon-fill" id="themeIcon"></i>
+    </button>
+
     @show
 
-    <!-- Bootstrap JS (mejor al final) y Activar tooltips Bootstrap -->
+    <!-- Bootstrap JS y tooltips -->
     <script src="{{ asset('js/bootstrap.bundle.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -165,7 +173,40 @@
             })
         });
     </script>
+
+    <!-- Script modo oscuro (solo iconos) -->
+    <script>
+        const toggleBtn = document.getElementById('darkModeToggle');
+        const icon = document.getElementById('themeIcon');
+
+        function setTheme(dark) {
+            if (dark) {
+                document.documentElement.classList.add('dark-mode');
+                icon.classList.remove('bi-moon-fill');
+                icon.classList.add('bi-sun-fill');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+                icon.classList.remove('bi-sun-fill');
+                icon.classList.add('bi-moon-fill');
+                localStorage.setItem('theme', 'light');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const theme = localStorage.getItem('theme') || 'light';
+            setTheme(theme === 'dark');
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.contains('dark-mode');
+            setTheme(!isDark);
+        });
+    </script>
+
     @stack('scripts')
+
+
 </body>
 
 </html>

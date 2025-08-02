@@ -1,86 +1,138 @@
 :root {
-    --laranews-dark: #343a40; /* Unificación real del color oscuro */
-    --laranews-red: #dc3545; /* Rojo principal */
-    --laranews-red-dark: #a71d2a; /* Rojo oscuro para hover */
+    --laranews-dark: #343a40;
+    --laranews-red: #dc3545;
+    --laranews-red-dark: #a71d2a;
+    --laranews-orange: #fd7e14;
+    --laranews-orange-dark: #e96b0c;
+    --laranews-light: #f8f9fa;
+    --laranews-shadow: rgba(0, 0, 0, 0.1);
 }
 
-/* === Tipografía y colores base === */
-html,
-body {
-    height: 100%;
-    margin: 0;
-}
-
+/* Base */
 body {
     font-family: "Poppins", sans-serif;
     background-color: #fefefe;
+    color: #212529;
+    margin: 0;
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
 .container-lg {
     flex: 1;
 }
 
-/* === Encabezados === */
+/* Headings */
 h1,
 h2 {
     font-weight: 600;
 }
 
-/* === Navbar === */
-.navbar {
-    border-radius: 0 !important;
-    margin-bottom: 1rem;
-}
-
+/* Navbar */
 .custom-navbar {
-    background-color: var(--laranews-dark);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 0 !important;
+    background: linear-gradient(to right, #212529, var(--laranews-dark));
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid #444;
 }
 
 .navbar-brand {
+    font-size: 1.4rem;
     color: var(--laranews-red) !important;
-    transition: color 0.3s ease;
 }
 
 .navbar-brand:hover {
     color: var(--laranews-red-dark) !important;
 }
 
-.navbar-dark .navbar-nav .nav-link {
-    transition: color 0.3s ease;
+.navbar-dark .nav-link {
+    color: rgba(255, 255, 255, 0.85) !important;
+    margin-right: 0.75rem;
+    transition: all 0.3s ease;
 }
 
-.navbar-dark .navbar-nav .nav-link:hover,
-.navbar-dark .navbar-nav .nav-link.active {
-    color: var(--laranews-red) !important;
+.navbar-dark .nav-link:hover,
+.navbar-dark .nav-link.active {
+    color: #fff !important;
+    border-bottom: 2px solid var(--laranews-red);
     font-weight: 600;
 }
 
-.navbar-dark .nav-link i:hover,
-.navbar-dark .nav-link.active i {
-    color: var(--laranews-red) !important;
-}
-
-/* === Footer === */
-.custom-footer {
+#darkModeToggle {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 1030;
     background-color: var(--laranews-dark);
-    color: white;
-    font-size: 0.9rem;
-    padding: 1rem 0;
-    border-radius: 0 !important;
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
 }
 
-/* === Carousel (Welcome) === */
+#darkModeToggle:hover {
+    background-color: var(--laranews-red);
+}
+
+/* Footer */
+.custom-footer {
+    background: linear-gradient(to top, #212529, var(--laranews-dark));
+    color: #ccc;
+    font-size: 0.9rem;
+    padding: 1.5rem 0;
+    border-top: 1px solid #444;
+    text-align: center;
+}
+
+/* Enlaces generales del footer */
+.custom-footer a {
+    color: #ccc;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+/* Íconos sociales (GitHub, LinkedIn) */
+.custom-footer a.social-link i {
+    color: #fff; /* color inicial del ícono */
+    transition: color 0.3s ease, transform 0.2s ease;
+}
+
+.custom-footer a.social-link:hover i {
+    color: var(--laranews-red); /* cambio al pasar el ratón */
+    transform: scale(1.2);
+}
+
+/* Cards */
+.card {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 10px var(--laranews-shadow);
+    transition: 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px var(--laranews-shadow);
+}
+
+.card-img-top {
+    height: 220px;
+    object-fit: cover;
+}
+
+/* Carousel */
 .carousel-item img {
     height: 400px;
     object-fit: cover;
 }
 
 .carousel-caption {
-    background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
     border-radius: 0.5rem;
 }
 
@@ -88,146 +140,86 @@ h2 {
     text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
 }
 
-/* === Cards === */
-.card-img-top {
-    height: 220px;
-    object-fit: cover;
+/* Botones */
+.btn-orange {
+    background-color: var(--laranews-orange);
+    color: white;
+    border: none;
 }
 
-.card {
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+.btn-orange:hover {
+    background-color: var(--laranews-orange-dark);
 }
 
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+.btn-outline-orange {
+    color: var(--laranews-orange);
+    border-color: var(--laranews-orange);
 }
 
-.card-header {
-    background-color: #f1f1f1;
-    color: #333;
-    font-weight: 600;
-}
-
-.card-header.bg-primary {
-    background-color: #fd7e14 !important;
+.btn-outline-orange:hover {
+    background-color: var(--laranews-orange);
     color: white;
 }
 
-/* === Badges === */
+/* Badges */
 .badge {
     font-size: 0.75rem;
     padding: 0.4em 0.6em;
     border-radius: 0.5rem;
 }
 
-/* === Botón naranja === */
-.bg-orange {
-    background-color: #fd7e14 !important;
-    color: white;
-}
-
-.btn-orange {
-    background-color: #fd7e14;
-    color: white;
-    border: none;
-}
-
-.btn-orange:hover {
-    background-color: #e96b0c;
-    color: white;
-}
-
-.btn-outline-orange {
-    color: #fd7e14;
-    border: 1px solid #fd7e14;
-    background-color: transparent;
-}
-
-.btn-outline-orange:hover {
-    background-color: #fd7e14;
-    color: white;
-}
-
-/* === Alertas === */
+/* Alertas */
 .alert {
     border-radius: 0.5rem;
 }
 
-/* === Paginación === */
+/* Paginación */
 .page-link {
     color: #6c757d;
     border-color: #dee2e6;
 }
 
-.page-link:hover {
-    color: #fff;
-    background-color: #fd7e14;
-    border-color: #fd7e14;
-}
-
+.page-link:hover,
 .page-item.active .page-link {
-    color: #fff;
-    background-color: #fd7e14;
-    border-color: #fd7e14;
+    background-color: var(--laranews-orange);
+    color: white;
+    border-color: var(--laranews-orange);
 }
 
-.page-item.disabled .page-link {
-    color: #adb5bd;
-    background-color: #fff;
-    border-color: #dee2e6;
+/* === Modo oscuro === */
+.dark-mode body {
+    background-color: #121212;
+    color: #eee;
 }
 
-/* === Carrusel móvil === */
-@media (max-width: 576px) {
-    .carousel-caption-box h3 {
-        font-size: 1.25rem;
-    }
-    .carousel-caption-box p {
-        display: none;
-    }
+.dark-mode .card,
+.dark-mode .navbar,
+.dark-mode .custom-footer {
+    background-color: #1e1e1e;
+    color: #ccc;
 }
 
-/* === Comentarios tipo thread === */
-.comment-thread {
-    transition: background-color 0.2s ease, transform 0.2s ease;
-    border: 1px solid rgba(0, 0, 0, 0.05);
+.dark-mode .btn-outline-orange {
+    color: #ffc107;
+    border-color: #ffc107;
 }
 
-.comment-thread:hover {
-    background-color: #fefefe;
-    transform: translateY(-2px);
+.dark-mode .btn-outline-orange:hover {
+    background-color: #ffc107;
+    color: #000;
 }
 
-.comment-thread form button {
-    opacity: 0.6;
-    transition: opacity 0.2s ease;
+.avatar-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #ccc;
 }
 
-.comment-thread form button:hover {
-    opacity: 1;
+.dark-mode .text-muted {
+    color: #bbb !important;
 }
-
-.avatar-icon .bi-person-circle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 48px;
-    width: 48px;
-}
-
-.comment-thread .comment-box {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.comment-thread .comment-box:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.comment-thread .author-comment {
-    background-color: #fff8e1;
-    border: 1px solid #ffe082;
+.dark-mode .form-text {
+    color: #ccc !important;
 }
