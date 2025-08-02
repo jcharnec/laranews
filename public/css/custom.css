@@ -223,3 +223,147 @@ h2 {
 .dark-mode .form-text {
     color: #ccc !important;
 }
+
+/* === Adaptaciones para móviles === */
+@media (max-width: 576px) {
+    /* Navbar */
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+
+    .navbar-dark .nav-link {
+        margin-right: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    /* Botón modo oscuro más pequeño */
+    #darkModeToggle {
+        width: 38px;
+        height: 38px;
+        bottom: 1rem;
+        right: 1rem;
+    }
+
+    #darkModeToggle i {
+        font-size: 1rem;
+    }
+
+    /* Footer */
+    .custom-footer {
+        font-size: 0.8rem;
+        padding: 1rem 0;
+    }
+
+    .custom-footer i {
+        font-size: 1.25rem !important;
+    }
+
+    /* Cards */
+    .card-img-top {
+        height: 180px;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .card-text {
+        font-size: 0.9rem;
+    }
+
+    /* Badge */
+    .badge {
+        font-size: 0.7rem;
+    }
+
+    /* Botones */
+    .btn,
+    .btn-orange,
+    .btn-outline-orange {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    /* Formularios */
+    .form-label,
+    .form-text {
+        font-size: 0.9rem;
+    }
+
+    .form-control {
+        font-size: 0.95rem;
+        padding: 0.45rem 0.75rem;
+    }
+}
+
+/* === Adaptaciones para tablets (≥576px y ≤768px) === */
+@media (min-width: 576px) and (max-width: 768px) {
+    /* Navbar */
+    .navbar-brand {
+        font-size: 1.3rem;
+    }
+
+    .navbar-dark .nav-link {
+        margin-right: 0.6rem;
+        font-size: 1rem;
+    }
+
+    /* Botón modo oscuro */
+    #darkModeToggle {
+        width: 42px;
+        height: 42px;
+        bottom: 1.25rem;
+        right: 1.25rem;
+    }
+
+    #darkModeToggle i {
+        font-size: 1.1rem;
+    }
+
+    /* Footer */
+    .custom-footer {
+        font-size: 0.85rem;
+        padding: 1.25rem 0;
+    }
+
+    .custom-footer i {
+        font-size: 1.4rem !important;
+    }
+
+    /* Cards */
+    .card-img-top {
+        height: 200px;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .card-text {
+        font-size: 1rem;
+    }
+
+    /* Formularios */
+    .form-label,
+    .form-text {
+        font-size: 1rem;
+    }
+
+    .form-control {
+        font-size: 1rem;
+        padding: 0.5rem 0.9rem;
+    }
+
+    /* Botones */
+    .btn,
+    .btn-orange,
+    .btn-outline-orange {
+        font-size: 1rem;
+        padding: 0.5rem 1rem;
+    }
+
+    /* Badge */
+    .badge {
+        font-size: 0.75rem;
+    }
+}

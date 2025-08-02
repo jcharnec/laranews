@@ -176,33 +176,36 @@
 
     <!-- Script modo oscuro (solo iconos) -->
     <script>
-        const toggleBtn = document.getElementById('darkModeToggle');
-        const icon = document.getElementById('themeIcon');
-
-        function setTheme(dark) {
-            if (dark) {
-                document.documentElement.classList.add('dark-mode');
-                icon.classList.remove('bi-moon-fill');
-                icon.classList.add('bi-sun-fill');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.documentElement.classList.remove('dark-mode');
-                icon.classList.remove('bi-sun-fill');
-                icon.classList.add('bi-moon-fill');
-                localStorage.setItem('theme', 'light');
-            }
-        }
-
         document.addEventListener('DOMContentLoaded', () => {
-            const theme = localStorage.getItem('theme') || 'light';
-            setTheme(theme === 'dark');
-        });
+            const toggleBtn = document.getElementById('darkModeToggle');
+            const icon = document.getElementById('themeIcon');
 
-        toggleBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.contains('dark-mode');
-            setTheme(!isDark);
+            function setTheme(dark) {
+                if (dark) {
+                    document.documentElement.classList.add('dark-mode');
+                    icon.classList.remove('bi-moon-fill');
+                    icon.classList.add('bi-sun-fill');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark-mode');
+                    icon.classList.remove('bi-sun-fill');
+                    icon.classList.add('bi-moon-fill');
+                    localStorage.setItem('theme', 'light');
+                }
+            }
+
+            // Cargar tema guardado
+            const savedTheme = localStorage.getItem('theme');
+            setTheme(savedTheme === 'dark');
+
+            // Toggle con clic
+            toggleBtn.addEventListener('click', () => {
+                const isDark = document.documentElement.classList.contains('dark-mode');
+                setTheme(!isDark);
+            });
         });
     </script>
+
 
     @stack('scripts')
 
