@@ -66,6 +66,10 @@ class AdminController extends Controller
         ]);
     }
 
+    /**
+     * Muestra los detalles de un usuario.
+     * Incluye sus roles y comentarios.
+     */
     public function userShow(User $user)
     {
         return view('admin.users.show', ['user' => $user]);
@@ -87,22 +91,29 @@ class AdminController extends Controller
         return view('admin.users.list', ['users' => $users, 'name' => $name, 'email' => $email]);
     }
 
+    /**
+     * Añade un rol a un usuario.
+     * No elimina los roles anteriores ni duplica.
+     */
     public function setRole(Request $request)
     {
-        $role = Role::find($request->input('role_id'));
-        $user = User::find($request->input('user_id'));
+        $roleId = $request->input('role_id');
+        $userId = $request->input('user_id');
 
-        try {
-            $user->roles()->attach($role->id, [
-                'created_at' => now(),
-                'updated_at' => now()
-            ]);
-            return back()->with('success', "Rol $role->role añadido a $user->name correctamente.");
-        } catch (QueryException $e) {
-            return back()->withErrors("No se pudo añadir el rol $role->role a $user->name. Es posible que ya lo tenga.");
-        }
+        $role = Role::findOrFail($roleId);
+        $user = User::findOrFail($userId);
+
+        // Asigna el rol sin eliminar los anteriores ni duplicar
+        $user->roles()->syncWithoutDetaching([$roleId]);
+
+        return back()->with('success', "Rol {$role->role} añadido a {$user->name} correctamente.");
     }
 
+
+    /**
+     * Quita un rol a un usuario.
+     * No elimina el usuario ni el rol, solo desvincula.
+     */
     public function removeRole(Request $request)
     {
         $role = Role::find($request->input('role_id'));
