@@ -36,8 +36,9 @@ class AppServiceProvider extends ServiceProvider
         });
 
         // ✅ Solución al problema del CSS no cargado en producción
-        if (app()->environment('production')) {
-            URL::forceScheme('https');
+        if (env('APP_ENV') === 'production') {
+            \Illuminate\Support\Facades\URL::forceRootUrl(config('app.url'));
+            \Illuminate\Support\Facades\URL::forceScheme('https');
         }
     }
 }

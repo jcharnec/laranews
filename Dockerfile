@@ -15,6 +15,7 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /e
 
 COPY . /var/www/html
 COPY entrypoint.sh /entrypoint.sh
+COPY .env /var/www/html/.env
 
 WORKDIR /var/www/html
 
@@ -31,9 +32,9 @@ RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" &&
     composer install --no-dev --optimize-autoloader
 
 RUN php artisan config:clear && \
-    php artisan cache:clear && \
     php artisan route:clear && \
     php artisan view:clear && \
+    php artisan cache:clear && \
     php artisan storage:link
 
 USER www-data
