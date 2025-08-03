@@ -5,27 +5,22 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Blade; // ✅ Esto sí está bien
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register()
     {
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot()
     {
         Paginator::useBootstrap();
         View::share('autor', 'Joan Pere Charneco');
 
-        // ✅ Registrar directiva personalizada para badge de tema
+        // Directiva para los colores de badge según tema
         Blade::directive('badgeClass', function ($tema) {
             return "<?php echo match(strtolower($tema)) {
                 'política' => 'bg-danger',
@@ -39,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
                 default => 'bg-secondary',
             }; ?>";
         });
+
+        // ✅ Solución al problema del CSS no cargado en producción
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
     }
 }
