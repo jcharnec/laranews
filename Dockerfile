@@ -19,9 +19,11 @@ COPY entrypoint.sh /entrypoint.sh
 WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/public \
+    && find /var/www/html/storage -type d -exec chmod 775 {} \; \
+    && find /var/www/html/storage -type f -exec chmod 664 {} \; \
+    && chmod -R ug+rwx /var/www/html/bootstrap/cache \
     && chmod +x /entrypoint.sh
+
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \

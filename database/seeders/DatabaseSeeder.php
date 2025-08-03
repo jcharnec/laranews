@@ -31,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
         // 3. Asignar el rol de administrador si existe
         $adminRole = Role::where('role', 'administrador')->first();
-        if ($adminRole) {
+        if ($adminRole && !$admin->roles->contains($adminRole->id)) {
             $admin->roles()->attach($adminRole->id);
         }
 
