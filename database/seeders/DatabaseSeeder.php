@@ -20,12 +20,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // 2. Crear usuario administrador fijo
-        $admin = User::create([
-            'name' => 'Administrador',
-            'email' => 'admin@example.com',
-            'password' => Hash::make('admin123'),
-            'email_verified_at' => now(),
-        ]);
+        $admin = User::firstOrCreate(
+            ['email' => 'admin@example.com'], // condición de búsqueda
+            [ // solo se usa si no existe
+                'name' => 'Administrador',
+                'password' => Hash::make('admin123'),
+                'email_verified_at' => now(),
+            ]
+        );
 
         // 3. Asignar el rol de administrador si existe
         $adminRole = Role::where('role', 'administrador')->first();
