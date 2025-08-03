@@ -14,12 +14,14 @@ RUN a2enmod rewrite
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /etc/apache2/sites-available/000-default.conf
 
 COPY . /var/www/html
+COPY entrypoint.sh /entrypoint.sh
 
 WORKDIR /var/www/html
 
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/public
+    && chmod -R 755 /var/www/html/public \
+    && chmod +x /entrypoint.sh
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" && \
     php composer-setup.php --install-dir=/usr/local/bin --filename=composer && \
@@ -34,5 +36,8 @@ RUN php artisan config:clear && \
 
 EXPOSE 80
 
-CMD ["apache2-foreground"]
+ENTRYPOINT ["/entrypoint.sh"]
+
+
+#CMD ["apache2-foreground"]
 
