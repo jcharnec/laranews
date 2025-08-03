@@ -57,10 +57,11 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function remainingRoles()
     {
-        $actualRoles = $this->roles;
-        $allRoles = Role::all();
-        return $allRoles->diff($actualRoles);
+        $asignados = $this->roles()->pluck('roles.id')->toArray();
+
+        return Role::whereNotIn('id', $asignados)->distinct()->get();
     }
+
 
     public function hasRole($roleNames): bool
     {
