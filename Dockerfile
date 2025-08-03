@@ -36,6 +36,8 @@ RUN php artisan config:clear && \
     php artisan view:clear && \
     php artisan storage:link
 
+USER www-data
+
 EXPOSE 80
 
 ENTRYPOINT ["/entrypoint.sh"]
