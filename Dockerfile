@@ -15,7 +15,6 @@ RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|g' /e
 
 COPY . /var/www/html
 COPY entrypoint.sh /entrypoint.sh
-COPY .env /var/www/html/.env
 
 WORKDIR /var/www/html
 
