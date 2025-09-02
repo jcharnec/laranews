@@ -27,9 +27,9 @@
 
 > _Puedes subir tus imágenes a la carpeta `/public/img` o usarlas desde GitHub para mostrar capturas reales de la app._
 
-| Registro de usuario           | Vista de noticia         |
-| ----------------------------- | ------------------------ |
-| ![Registro](img/register.png) | ![Noticia](img/news.png) |
+| Registro de usuario               | Vista de noticia            |
+| --------------------------------- | --------------------------- |
+| ![Registro](imgages/register.png) | ![Noticia](images/news.png) |
 
 ---
 
