@@ -106,14 +106,8 @@ php artisan serve
 
 ## 👤 Autor
 
--   💻 Desarrollador: [Tu nombre o nickname]
+-   💻 Desarrollador: Joan Pere Charneco Boix
 -   🌐 Portfolio: [https://hotadev.com.es](https://hotadev.com.es)
-
----
-
-## 📄 Licencia
-
-Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
