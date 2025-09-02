@@ -74,10 +74,10 @@ php artisan storage:link
 
 ## 🔐 Usuarios por defecto (Seeder)
 
-| Email              | Rol   | Contraseña |
-| ------------------ | ----- | ---------- |
-| admin@laranews.com | admin | password   |
-| user@laranews.com  | user  | password   |
+| Email             | Rol   | Contraseña |
+| ----------------- | ----- | ---------- |
+| admin@example.com | admin | admin123   |
+| user@example.com  | user  | password   |
 
 ---
 
