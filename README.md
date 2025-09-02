@@ -1,6 +1,6 @@
 # 📰 LaraNews
 
-![Laravel](https://img.shields.io/badge/Laravel-10.x-red?style=flat&logo=laravel)
+![Laravel](https://img.shields.io/badge/Laravel-8.83.27-red?style=flat&logo=laravel)
 ![PHP](https://img.shields.io/badge/PHP-^8.2-blue?style=flat&logo=php)
 ![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat)
 ![Status](https://img.shields.io/badge/status-en%20desarrollo-orange)
@@ -11,15 +11,15 @@
 
 ## 🚀 Características
 
-- Registro, login y verificación por correo electrónico.
-- Panel de administración para gestionar usuarios y roles.
-- CRUD de noticias con imagen y temática.
-- Subida de imagen de perfil (avatar) y validaciones.
-- Comentarios en noticias con posibilidad de eliminar.
-- Papelera para restaurar noticias y usuarios eliminados (SoftDeletes).
-- Sistema de roles (`admin`, `user`, `editor`, etc.).
-- Interfaz responsive con Bootstrap 5.
-- Notificaciones visuales (componente `<x-alert>`).
+-   Registro, login y verificación por correo electrónico.
+-   Panel de administración para gestionar usuarios y roles.
+-   CRUD de noticias con imagen y temática.
+-   Subida de imagen de perfil (avatar) y validaciones.
+-   Comentarios en noticias con posibilidad de eliminar.
+-   Papelera para restaurar noticias y usuarios eliminados (SoftDeletes).
+-   Sistema de roles (`admin`, `user`, `editor`, etc.).
+-   Interfaz responsive con Bootstrap 5.
+-   Notificaciones visuales (componente `<x-alert>`).
 
 ---
 
@@ -27,8 +27,8 @@
 
 > _Puedes subir tus imágenes a la carpeta `/public/img` o usarlas desde GitHub para mostrar capturas reales de la app._
 
-| Registro de usuario | Vista de noticia |
-|---------------------|------------------|
+| Registro de usuario           | Vista de noticia         |
+| ----------------------------- | ------------------------ |
 | ![Registro](img/register.png) | ![Noticia](img/news.png) |
 
 ---
@@ -76,10 +76,10 @@ php artisan storage:link
 
 ## 🔐 Usuarios por defecto (Seeder)
 
-| Email              | Rol      | Contraseña  |
-|-------------------|----------|-------------|
-| admin@laranews.com| admin    | password    |
-| user@laranews.com | user     | password    |
+| Email              | Rol   | Contraseña |
+| ------------------ | ----- | ---------- |
+| admin@laranews.com | admin | password   |
+| user@laranews.com  | user  | password   |
 
 ---
 
@@ -94,20 +94,20 @@ php artisan serve
 
 ## 🛠️ Tecnologías utilizadas
 
-- Laravel 10.x
-- PHP 8.2+
-- Bootstrap 5
-- MySQL o PostgreSQL
-- Blade (motor de plantillas)
-- Laravel Breeze (si se usa)
-- Laravel Storage (para manejo de imágenes)
+-   Laravel 8.83.27
+-   PHP 8.2+
+-   Bootstrap 5
+-   MySQL o PostgreSQL
+-   Blade (motor de plantillas)
+-   Laravel Breeze (si se usa)
+-   Laravel Storage (para manejo de imágenes)
 
 ---
 
 ## 👤 Autor
 
-- 💻 Desarrollador: [Tu nombre o nickname]
-- 🌐 Portfolio: [https://hotadev.com.es](https://hotadev.com.es)
+-   💻 Desarrollador: [Tu nombre o nickname]
+-   🌐 Portfolio: [https://hotadev.com.es](https://hotadev.com.es)
 
 ---
 
